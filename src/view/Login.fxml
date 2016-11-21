@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane maxHeight="1024.0" maxWidth="728.0" minHeight="500.0" minWidth="400.0" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="view.LoginController">
+  <!-- TODO Add Nodes -->
+  
+  <children>
+    <Group id="Group" layoutX="54.0" layoutY="302.0">
+      <children>
+      <Label fx:id="lblStatus" layoutX="54.0" layoutY="25.0">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Label>
+        <Label layoutX="0.0" layoutY="0.0" text="Usuario:">
+          <font>
+            <Font size="13.0" fx:id="x1" />
+          </font>
+        </Label>
+        <Label font="$x1" layoutX="0.0" layoutY="36.0" text="Contraseña:" />
+        <Label font="$x1" layoutX="0.0" layoutY="73.0" text="Host:" />
+      </children>
+    </Group>
+    <Group id="Group" layoutX="152.0" layoutY="299.0">
+      <children>
+        <TextField id="txtUname" fx:id="txtUsername" layoutX="0.0" layoutY="0.0" prefWidth="173.0" />
+        <PasswordField id="yxyPassword" fx:id="txtPassword" layoutX="0.0" layoutY="36.0" prefWidth="173.00009999999747" />
+        <TextField fx:id="txtHost" layoutX="0.0" layoutY="73.0" prefWidth="173.0" text="https://ubuvirtual.ubu.es" />
+      </children>
+    </Group>
+    <Button id="Entrar" fx:id="btnLogin" cancelButton="false" defaultButton="false" disable="false" focusTraversable="true" graphicTextGap="5.0" layoutX="106.0" layoutY="440.0" mnemonicParsing="false" onAction="#Login" prefWidth="70.0" text="Entrar" textOverrun="ELLIPSIS" underline="false" visible="true">
+      <font>
+        <Font size="14.0" fx:id="x2" />
+      </font>
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor>
+    </Button>
+    <Button fx:id="btnDelete" onAction="#Clear" font="$x2" layoutX="234.0" layoutY="440.0" mnemonicParsing="false" prefWidth="70.0" text="Borrar">
+         <cursor>
+            <Cursor fx:constant="HAND" />
+         </cursor></Button>
+      <ImageView fitHeight="150.0" fitWidth="200.0" layoutX="100.0" layoutY="80.0" pickOnBounds="true" preserveRatio="true" />
+      <ImageView fitHeight="207.0" fitWidth="302.0" layoutX="116.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="img/logo.png" />
+         </image>
+      </ImageView>
+      
+  </children>
+</AnchorPane>
