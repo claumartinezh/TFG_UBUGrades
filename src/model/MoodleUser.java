@@ -1,4 +1,5 @@
 package model;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,12 @@ import org.json.JSONObject;
 
 import view.UBUGrades;
 
+/**
+ * Clase para el usuario logeado en la aplicación
+ * 
+ * @author Claudia Martínez Herrero
+ *
+ */
 public class MoodleUser {
 	private int id;
 	private String userName;
@@ -56,10 +63,12 @@ public class MoodleUser {
 							this.firstAccess = new Date(jsonObject.getLong("firstaccess") * 1000);
 						if (new Date(jsonObject.getLong("lastaccess")) != null)
 							this.lastAccess = new Date(jsonObject.getLong("lastaccess") * 1000);
-						/*if (jsonObject.getString("city") != null)
-							this.city = jsonObject.getString("city");
-						if (jsonObject.getString("country") != null)
-							this.country = jsonObject.getString("country");*/
+						/*
+						 * if (jsonObject.getString("city") != null) this.city =
+						 * jsonObject.getString("city"); if
+						 * (jsonObject.getString("country") != null)
+						 * this.country = jsonObject.getString("country");
+						 */
 						this.courses = new ArrayList<Course>();
 					}
 				}
@@ -117,7 +126,7 @@ public class MoodleUser {
 					for (int i = 0; i < jsonArray.length(); i++) {
 						JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 						if (jsonObject != null) {
-							this.courses.add(new Course(token,jsonObject));
+							this.courses.add(new Course(token, jsonObject));
 						}
 					}
 				}

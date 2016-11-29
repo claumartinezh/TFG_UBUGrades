@@ -1,4 +1,5 @@
 package model;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -12,6 +13,12 @@ import org.json.JSONObject;
 
 import view.UBUGrades;
 
+/**
+ * Clase para un usuario matriculado en una asignatura
+ * 
+ * @author Claudia Martínez Herrero
+ *
+ */
 public class EnrolledUser {
 	private int id;
 	private String firstName;
@@ -28,20 +35,25 @@ public class EnrolledUser {
 
 	public EnrolledUser(String token, JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
-		if (obj.getString("firstname") != null)
-			this.firstName = obj.getString("firstname");
-		if (obj.getString("lastname") != null)
-			this.lastName = obj.getString("lastname");
+		/*
+		 * if (obj.getString("firstname") != null) this.firstName =
+		 * obj.getString("firstname"); if (obj.getString("lastname") != null)
+		 * this.lastName = obj.getString("lastname");
+		 */
 		if (obj.getString("fullname") != null)
 			this.fullName = obj.getString("fullname");
-		if (obj.getString("email") != null)
-			this.email = obj.getString("email");
+		/*
+		 * if (obj.getString("email") != null) this.email =
+		 * obj.getString("email");
+		 */
 		if (new Date(obj.getLong("firstaccess")) != null)
 			this.firstAccess = new Date(obj.getLong("firstaccess") * 1000);
 		if (new Date(obj.getLong("lastaccess")) != null)
 			this.lastAccess = new Date(obj.getLong("lastaccess") * 1000);
-		if (obj.getString("description") != null)
-			this.description = obj.getString("description");
+		/*
+		 * if (obj.getString("description") != null) this.description =
+		 * obj.getString("description");
+		 */
 		if (obj.getString("profileimageurl") != null)
 			this.profileImageUrl = obj.getString("profileimageurl");
 
@@ -52,7 +64,7 @@ public class EnrolledUser {
 		 * this.summary = obj.getString("summary");
 		 */
 		this.courses = new ArrayList<Integer>();
-		//this.setCourses(token);
+		// this.setCourses(token);
 	}
 
 	public int getId() {

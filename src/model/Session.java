@@ -1,4 +1,5 @@
 package model;
+
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -9,15 +10,16 @@ import org.json.JSONObject;
 import view.UBUGrades;
 
 /**
+ * Clase sesión. Obtiene el token de usuario y guarda sus parámetros
  * 
- * 
- * @author Claudia
+ * @author Claudia Martínez Herrero
  *
  */
 public class Session {
 	private String eMail;
 	private String password;
 	private String tokenUser;
+	private Course actualCourse;
 
 	public Session(String mail, String pass) {
 		this.eMail = mail;
@@ -34,8 +36,8 @@ public class Session {
 		// Gson gson = new Gson();
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			HttpGet httpget = new HttpGet(UBUGrades.host + "/login/token.php?username=" + this.eMail
-					+ "&password=" + this.password + "&service=" + MoodleOptions.SERVICIO_WEB_MOODLE);
+			HttpGet httpget = new HttpGet(UBUGrades.host + "/login/token.php?username=" + this.eMail + "&password="
+					+ this.password + "&service=" + MoodleOptions.SERVICIO_WEB_MOODLE);
 			CloseableHttpResponse response = httpclient.execute(httpget);
 
 			// en localhost (da error)
@@ -63,8 +65,17 @@ public class Session {
 	public String getToken() {
 		return this.tokenUser;
 	}
+
 	public String getEmail() {
 		return this.eMail;
+	}
+
+	public void setCourse(Course course) {
+		this.actualCourse = course;
+	}
+
+	public Course getCourse() {
+		return this.actualCourse;
 	}
 
 }

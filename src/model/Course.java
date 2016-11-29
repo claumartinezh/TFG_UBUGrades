@@ -1,4 +1,5 @@
 package model;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 
@@ -8,11 +9,16 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import view.UBUGrades;
 
+/**
+ * Clase curso
+ * 
+ * @author Claudia Martínez Herrero
+ *
+ */
 public class Course implements Serializable {
 	/**
 	 * 
@@ -26,7 +32,7 @@ public class Course implements Serializable {
 	private String summary;
 	public ArrayList<EnrolledUser> enrolledUsers;
 
-	public Course(String token,JSONObject obj) throws Exception {
+	public Course(String token, JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
 		if (obj.getString("shortname") != null)
 			this.shortname = obj.getString("shortname");
@@ -38,8 +44,8 @@ public class Course implements Serializable {
 			this.idnumber = obj.getString("idnumber");
 		if (obj.getString("summary") != null)
 			this.summary = obj.getString("summary");
-		this.enrolledUsers=new ArrayList<EnrolledUser>();
-		//this.setEnrolledUsers(token, this.id);
+		this.enrolledUsers = new ArrayList<EnrolledUser>();
+		this.setEnrolledUsers(token, this.id);
 	}
 
 	public int getId() {
@@ -65,11 +71,13 @@ public class Course implements Serializable {
 	public String getSummary() {
 		return this.summary;
 	}
+
 	public void setEnrolledUsers(String token, int idCurso) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpGet httpget = new HttpGet(UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
-					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_USUARIOS_MATRICULADOS + "&courseid=" + idCurso);
+					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_USUARIOS_MATRICULADOS
+					+ "&courseid=" + idCurso);
 			CloseableHttpResponse response = httpclient.execute(httpget);
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
@@ -78,7 +86,7 @@ public class Course implements Serializable {
 					for (int i = 0; i < jsonArray.length(); i++) {
 						JSONObject jsonObject = (JSONObject) jsonArray.get(i);
 						if (jsonObject != null) {
-							this.enrolledUsers.add(new EnrolledUser(token,jsonObject));
+							this.enrolledUsers.add(new EnrolledUser(token, jsonObject));
 						}
 					}
 				}
@@ -89,7 +97,8 @@ public class Course implements Serializable {
 			httpclient.close();
 		}
 	}
-	public ArrayList<EnrolledUser> getEnrolledUsers(){
+
+	public ArrayList<EnrolledUser> getEnrolledUsers() {
 		return this.enrolledUsers;
 	}
 }
