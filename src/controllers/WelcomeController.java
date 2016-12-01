@@ -1,4 +1,4 @@
-package view;
+package controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -64,11 +64,11 @@ public class WelcomeController implements Initializable {
 	 * @throws Exception
 	 */
 	public void EnterCourse(ActionEvent event) throws Exception {
-		String value = listCourses.getSelectionModel().getSelectedItem();
-		UBUGrades.session.setCourse(getCourseByString(value));
+		String selectedCourse = listCourses.getSelectionModel().getSelectedItem();
+		UBUGrades.session.setCourse(getCourseByString(selectedCourse));
 		System.out.println(" Curso seleccionado: " + UBUGrades.session.getCourse().getFullName());
 		FXMLLoader loader = new FXMLLoader();
-		loader.setLocation(getClass().getResource("./Main.fxml"));
+		loader.setLocation(getClass().getResource("./../view/Main.fxml"));
 		UBUGrades.stage = new Stage();
 		Parent root = loader.load();
 		Scene scene = new Scene(root);

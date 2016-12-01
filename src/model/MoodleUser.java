@@ -12,7 +12,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import view.UBUGrades;
+import controllers.UBUGrades;
 
 /**
  * Clase para el usuario logeado en la aplicación

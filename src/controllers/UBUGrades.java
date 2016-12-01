@@ -1,4 +1,4 @@
-package view;
+package controllers;
 
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
@@ -25,7 +25,7 @@ public class UBUGrades extends Application {
 		try {
 			System.out.println("Bienvenido a UBUGrades");
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("./Login.fxml"));
+			loader.setLocation(getClass().getResource("./../view/Login.fxml"));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());

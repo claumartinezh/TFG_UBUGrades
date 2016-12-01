@@ -11,7 +11,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import view.UBUGrades;
+import controllers.UBUGrades;
 
 /**
  * Clase para un usuario matriculado en una asignatura
@@ -21,16 +21,20 @@ import view.UBUGrades;
  */
 public class EnrolledUser {
 	private int id;
-	private String firstName;
-	private String lastName;
+	// private String firstName;
+	// private String lastName;
 	private String fullName;
-	private String email;
+	// private String email;
 	private Date firstAccess;
 	private Date lastAccess;
-	private String description;
+	public String description;
+	private String descriptionFormat;
+	private String city;
+	private String country;
+	private String profileImageUrlSmall;
 	private String profileImageUrl;
-	private int roleId;
-	private String roleShortName;
+	private ArrayList<Role> roles;
+	private ArrayList<Group> groups;
 	private ArrayList<Integer> courses;
 
 	public EnrolledUser(String token, JSONObject obj) throws Exception {
@@ -57,6 +61,19 @@ public class EnrolledUser {
 		if (obj.getString("profileimageurl") != null)
 			this.profileImageUrl = obj.getString("profileimageurl");
 
+		if (obj.getJSONArray("roles") != null) {
+			JSONArray roleArray = obj.getJSONArray("roles");
+			roles = new ArrayList<Role>();
+			for (int i = 0; i < roleArray.length(); i++) {
+				// Establece un rol con el id, name y shortname obtenido de cada
+				// JSONObject del JSONArray
+				Role rol = new Role(roleArray.getJSONObject(i).getInt("roleid"),
+						roleArray.getJSONObject(i).getString("name"),
+						roleArray.getJSONObject(i).getString("shortname"));
+				if (rol != null)
+					roles.add(rol);
+			}
+		}
 		/*
 		 * if (obj.getInt("roleid") != 0) this.roleId = obj.getInt("roleid"); if
 		 * (obj.getString("roleshortname") != null) this.roleShortName =
@@ -71,21 +88,21 @@ public class EnrolledUser {
 		return this.id;
 	}
 
-	public String getFirstName() {
-		return this.firstName;
-	}
-
-	public String getLastName() {
-		return this.lastName;
-	}
+	// public String getFirstName() {
+	// return this.firstName;
+	// }
+	//
+	// public String getLastName() {
+	// return this.lastName;
+	// }
 
 	public String getFullName() {
 		return this.fullName;
 	}
 
-	public String getEmail() {
-		return this.email;
-	}
+	// public String getEmail() {
+	// return this.email;
+	// }
 
 	public Date getFirstAccess() {
 		return this.firstAccess;
@@ -99,16 +116,32 @@ public class EnrolledUser {
 		return this.description;
 	}
 
+	public String getDescriptionFormat() {
+		return this.descriptionFormat;
+	}
+
+	public String getCity() {
+		return this.city;
+	}
+
+	public String getCountry() {
+		return this.country;
+	}
+
+	public String getProfileImageUrlSmall() {
+		return this.profileImageUrlSmall;
+	}
+
 	public String getProfileImageUrl() {
 		return this.profileImageUrl;
 	}
 
-	public int getRoleId() {
-		return this.id;
+	public ArrayList<Role> getRoles() {
+		return this.roles;
 	}
 
-	public String getRoleShortName() {
-		return this.roleShortName;
+	public ArrayList<Group> getGroups() {
+		return this.groups;
 	}
 
 	public void setCourses(String token) throws Exception {

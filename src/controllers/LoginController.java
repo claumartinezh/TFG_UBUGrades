@@ -1,5 +1,5 @@
 
-package view;
+package controllers;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -45,7 +45,7 @@ public class LoginController {
 		}
 		if (correcto) {
 			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("./Welcome.fxml"));
+			loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
 			UBUGrades.stage = new Stage();
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
