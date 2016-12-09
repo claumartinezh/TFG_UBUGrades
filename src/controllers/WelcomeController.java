@@ -18,6 +18,13 @@ import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import model.*;
 
+/**
+ * Clase para controlar la pantalla de bienvenida en la que se muestran los
+ * cursos del usuario logueado.
+ * 
+ * @author Claudia Martínez Herrero
+ *
+ */
 public class WelcomeController implements Initializable {
 	@FXML
 	public Label lblUser;
@@ -64,9 +71,12 @@ public class WelcomeController implements Initializable {
 	 * @throws Exception
 	 */
 	public void EnterCourse(ActionEvent event) throws Exception {
+		// Guardamos en una variable el curso seleccionado por el usuario
 		String selectedCourse = listCourses.getSelectionModel().getSelectedItem();
 		UBUGrades.session.setCourse(getCourseByString(selectedCourse));
 		System.out.println(" Curso seleccionado: " + UBUGrades.session.getCourse().getFullName());
+
+		// Accedemos a la siguiente ventana:
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("./../view/Main.fxml"));
 		UBUGrades.stage = new Stage();

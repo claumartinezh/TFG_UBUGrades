@@ -2,28 +2,25 @@ package controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TreeItem;
-import javafx.scene.control.TreeView;
-import javafx.scene.layout.FlowPane;
+import javafx.scene.control.TextField;
 import model.EnrolledUser;
+import model.Group;
 import model.Role;
 
 /**
@@ -54,56 +51,118 @@ public class MainController implements Initializable {
 	public MenuButton slcRole;
 	MenuItem[] roleMenuItems;
 
+	@FXML
+	public MenuButton slcGroup;
+	MenuItem[] groupMenuItems;
+
+	String filterRole = "Todos";
+	String filterGroup = "Todos";
+	String patternParticipants = "";
+
+	@FXML
+	public TextField tfdParticipants;
+	// @FXML
+	// public TextField tfdItems;
+
 	/**
 	 * Función initialize. Muestra los usuarios matriculados en el curso.
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
+			// Establecemos la lista de todos participantes
 			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
-			// Cargamos la lista de los usuarios
+			// Cargamos una lista con los nombres de los participantes
 			ArrayList<String> nameUsers = new ArrayList<String>();
-			
-			// cargamos botón de roles {
-			ArrayList<String> rolesList = UBUGrades.session.getCourse().getRoles();
 
-			// guardamos el nombre de los roles que existen en un array:
-			ArrayList<MenuItem> roleNames = new ArrayList<MenuItem>();
+			//////////////////////////////////////////////////////////////////////////
+			// Manejo de roles (MenuButton Rol):
+			EventHandler<ActionEvent> actionRole = selectRole();
+			// Cargamos una lista con los nombres de los roles
+			ArrayList<String> rolesList = UBUGrades.session.getCourse().getRoles();
+			// Convertimos la lista a una lista de MenuItems para el MenuButton
+			ArrayList<MenuItem> rolesItemsList = new ArrayList<MenuItem>();
+			// En principio se van a mostrar todos los participantes con
+			// cualquier
+			// rol
+			MenuItem mi = (new MenuItem("Todos"));
+			// Añadimos el manejador de eventos al primer MenuItem
+			mi.setOnAction(actionRole);
+			rolesItemsList.add(mi);
+
 			for (int i = 0; i < rolesList.size(); i++) {
 				String rol = rolesList.get(i);
-				roleNames.add(new MenuItem(rol));
+				mi = (new MenuItem(rol));
+				mi.setOnAction(actionRole);
+				// Añadimos el manejador de eventos a cada MenuItem
+				rolesItemsList.add(mi);
 			}
-			
-			// almacenamos el array de nombres de roles al Botón
-			roleMenuItems = new MenuItem[roleNames.size()];
-			for (int i = 0; i < roleNames.size(); i++) {
-				roleMenuItems[i] = roleNames.get(i);
-			}
-			List<MenuItem> cosa3 = new ArrayList<>();
-			for (MenuItem mi : roleMenuItems) {
-				cosa3.add(mi);
-			}
-			System.out.println(roleMenuItems.toString());
 
-			assert slcRole != null : "Botón no enganchado en la interfaz";
-			// slcRole = new MenuButton("Rol2", null, cosa2);
-			// slcRole.getItems().addAll(new MenuItem("Texto1"), new
-			// MenuItem("Texto2"));
-			slcRole.getItems().addAll(cosa3);
-			// slcRole.getItems().addAll(cosa);
+			// Asignamos la lista de MenuItems al MenuButton "Rol"
+			slcRole.getItems().addAll(rolesItemsList);
+			slcRole.setText("Todos");
+
+			//////////////////////////////////////////////////////////////////////////
+			// Manejo de grupos (MenuButton Grupo):
+			EventHandler<ActionEvent> actionGroup = selectGroup();
+			// Cargamos una lista de los nombres de los grupos
+			ArrayList<String> groupsList = UBUGrades.session.getCourse().getGroups();
+			// Convertimos la lista a una lista de MenuItems para el MenuButton
+			ArrayList<MenuItem> groupsItemsList = new ArrayList<MenuItem>();
+			// En principio se van a mostrar todos los participantes en
+			// cualquier
+			// grupo
+			mi = (new MenuItem("Todos"));
+			// Añadimos el manejador de eventos al primer MenuItem
+			mi.setOnAction(actionGroup);
+			groupsItemsList.add(mi);
+
+			for (int i = 0; i < groupsList.size(); i++) {
+				String group = groupsList.get(i);
+				mi = (new MenuItem(group));
+				// Añadimos el manejador de eventos a cada MenuItem
+				mi.setOnAction(actionGroup);
+				groupsItemsList.add(mi);
+			}
+			// Asignamos la lista de MenuItems al MenuButton "Grupo"
+			slcGroup.getItems().addAll(groupsItemsList);
+			slcGroup.setText("Todos");
+
+			////////////////////////////////////////////////////////
+			// Mostramos todos los participantes
 			for (int j = 0; j < users.size(); j++) {
 				nameUsers.add(users.get(j).getFullName());
 			}
-			// } carga de roles en el botón
-			
 			list = FXCollections.observableArrayList(nameUsers);
 			System.out.println("-- Mostrando Participantes");
+
+			// Inicializamos el listener del textField
+			tfdParticipants.setOnAction(inputParticipant());
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
+		// Activamos la selección múltiple en la lista de participantes
 		listParticipants.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+		// Asignamos el manejador de eventos de la lista
+		// Al clickar en la lista, recalculamos el número de elementos
+		// seleccionados
+		listParticipants.setOnMouseClicked(new EventHandler<Event>() {
+			// TODO
+			// Manejador que llama a la función de mostrar gráfico de los
+			// elementos selecionados
+			@Override
+			public void handle(Event event) {
+				// IMPLEMENTAR
+				ObservableList<String> selectedItems = listParticipants.getSelectionModel().getSelectedItems();
+				for (String s : selectedItems) {
+					System.out.println("selected item " + s);
+				}
+				System.out.println();
+			}
+		});
+
 		// Mostramos la lista de participantes
 		listParticipants.setItems(list);
 
@@ -126,40 +185,140 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para el botón Salir, que cierra la aplicación.
+	 * Manejador de eventos para el botón de filtro por roles. Devuelve un
+	 * manejador de eventos para cada item.
 	 * 
-	 * @param event
-	 * @throws Exception
+	 * @return
 	 */
-	/*
-	 * @FXML private void closeButtonAction(ActionEvent event) throws Exception
-	 * { System.out.println("Presionado botón salir"); Stage stage = (Stage)
-	 * btnExit.getScene().getWindow(); stage.close(); }
-	 */
+	private EventHandler<ActionEvent> selectRole() {
+		return new EventHandler<ActionEvent>() {
+			/**
+			 * Recibe un evento (relacionado con un MenuItem) y responde en
+			 * consecuencia. El usuario elige un menuItem y filtra la lista de
+			 * participantes
+			 */
+			public void handle(ActionEvent event) {
+				// Obtenemos el item que se ha seleccionado
+				MenuItem mItem = (MenuItem) event.getSource();
+				// Obtenemos el valor (rol) para filtrar la lista de
+				// participantes
+				filterRole = mItem.getText();
+				filterParticipants();
+				slcRole.setText(filterRole);
+			}
+		};
+	}
 
-	public void SelectRole(ActionEvent event) throws Exception {
-		String selectedRole = slcRole.getText();
+	/**
+	 * Manejador de eventos para el botón de filtro por grupos. Devuelve un
+	 * manejador de eventos para cada item.
+	 * 
+	 * @return
+	 */
+	private EventHandler<ActionEvent> selectGroup() {
+		return new EventHandler<ActionEvent>() {
+			/**
+			 * Recibe un evento (relacionado con un MenuItem) y responde en
+			 * consecuencia. El usuario elige un menuItem y filtra la lista de
+			 * participantes
+			 */
+			public void handle(ActionEvent event) {
+				// Obtenemos el item que se ha seleccionado
+				MenuItem mItem = (MenuItem) event.getSource();
+				// Obtenemos el valor (rol) para filtrar la lista de
+				// participantes
+				filterGroup = mItem.getText();
+				filterParticipants();
+				slcGroup.setText(filterGroup);
+			}
+		};
+	}
+
+	/**
+	 * Manejador de eventos para el textField de filtro de participantes.
+	 * 
+	 * @return
+	 */
+	private EventHandler<ActionEvent> inputParticipant() {
+		return new EventHandler<ActionEvent>() {
+			/**
+			 * Recibe un evento (relacionado con un MenuItem) y responde en
+			 * consecuencia. El usuario elige un menuItem y filtra la lista de
+			 * participantes
+			 */
+			public void handle(ActionEvent event) {
+				patternParticipants = tfdParticipants.getText();
+				filterParticipants();
+			}
+		};
+	}
+
+	/**
+	 * Función para filtra los participantes según el rol y el grupo
+	 * seleccionado en los MenuButtons.
+	 */
+	public void filterParticipants() {
 		try {
+			boolean roleYes;
+			boolean groupYes;
+			boolean patternYes;
 			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
-			// Cargamos la lista de los usuarios
-			ArrayList<String> rolesList = UBUGrades.session.getCourse().getRoles();
+			// Cargamos la lista de los roles
 			ArrayList<String> nameUsers = new ArrayList<String>();
-			slcRole = new MenuButton("-");
-			rolesList.remove("-");
+			// Obtenemos los participantes que tienen el rol elegido
 			for (int i = 0; i < users.size(); i++) {
+				// Filtrado por rol:
+				roleYes = false;
 				ArrayList<Role> roles = users.get(i).getRoles();
-				// añadimos los nombres de usuario
-				for (int j = 0; j < roles.size(); j++) {
-					if (roles.get(j).getName().equals(selectedRole)) {
-						nameUsers.add(users.get(i).getFullName());
+				// Si no tiene rol
+				if (roles.size() == 0 && filterRole.equals("Todos")) {
+					roleYes = true;
+				} else {
+					for (int j = 0; j < roles.size(); j++) {
+						// Comprobamos si el usuario pasa el filtro de "rol"
+						if (roles.get(j).getName().equals(filterRole) || filterRole.equals("Todos")) {
+							roleYes = true;
+						}
 					}
 				}
+				// Filtrado por grupo:
+				groupYes = false;
+				ArrayList<Group> groups = users.get(i).getGroups();
+				if (groups.size() == 0 && filterGroup.equals("Todos")) {
+					groupYes = true;
+				} else {
+					for (int k = 0; k < groups.size(); k++) {
+						// Comprobamos si el usuario pasa el filtro de "grupo"
+						if (groups.get(k).getName().equals(filterGroup) || filterGroup.equals("Todos")) {
+							groupYes = true;
+						}
+					}
+				}
+				// Filtrado por patrón:
+				patternYes = false;
+				if (patternParticipants.equals("")) {
+					patternYes = true;
+				} else {
+					Pattern pattern = Pattern.compile(patternParticipants);
+					Matcher match = pattern.matcher(users.get(i).getFullName());
+					if (match.find()) {
+						patternYes = true;
+					}
+				}
+
+				// Si el usuario se corresponde con los filtros
+				if (groupYes && roleYes && patternYes)
+					nameUsers.add(users.get(i).getFullName());
 			}
 			list = FXCollections.observableArrayList(nameUsers);
 			System.out.println("-- Mostrando Participantes");
+			for (String nameUser : nameUsers) {
+				System.out.println("      " + nameUser);
+			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		listParticipants.setItems(list);
 	}
 }

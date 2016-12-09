@@ -32,11 +32,11 @@
 		<Group id="Group" layoutX="152.0" layoutY="299.0">
 			<children>
 				<TextField id="txtUname" fx:id="txtUsername" layoutY="27.0"
-					prefWidth="173.0" text="cmh0014@alu.ubu.es"/>
+					prefWidth="173.0" text="rmartico@ubu.es"/>
 				<PasswordField id="yxyPassword" fx:id="txtPassword"
-					layoutY="63.0" prefWidth="173.00009999999747" text="5968.grt"/>
+					layoutY="63.0" prefWidth="173.00009999999747" text="Admin.16"/>
 				<TextField fx:id="txtHost" layoutY="100.0" prefWidth="173.0"
-					text="https://ubuvirtual.ubu.es" />
+					text="http://localhost" />
 			</children>
 		</Group>
 		<Button id="Entrar" fx:id="btnLogin" cancelButton="false"

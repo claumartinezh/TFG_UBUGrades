@@ -35,15 +35,19 @@ public class LoginController {
 	 * @throws Exception
 	 */
 	public void Login(ActionEvent event) throws Exception {
+		// Almacenamos los parámetros introducidos por el usuario:
 		UBUGrades.host = txtHost.getText();
 		UBUGrades.session = new Session(txtUsername.getText(), txtPassword.getText());
 		Boolean correcto = true;
+
 		try {
 			UBUGrades.session.setToken();
 		} catch (Exception e) {
 			correcto = false;
 		}
+		// Si el login es correcto
 		if (correcto) {
+			// Accedemos a la siguiente ventana
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
 			UBUGrades.stage = new Stage();

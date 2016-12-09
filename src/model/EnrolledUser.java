@@ -74,12 +74,21 @@ public class EnrolledUser {
 					roles.add(rol);
 			}
 		}
-		/*
-		 * if (obj.getInt("roleid") != 0) this.roleId = obj.getInt("roleid"); if
-		 * (obj.getString("roleshortname") != null) this.roleShortName =
-		 * obj.getString("roleshortname"); if (obj.getString("summary") != null)
-		 * this.summary = obj.getString("summary");
-		 */
+
+		if (obj.getJSONArray("groups") != null) {
+			JSONArray groupArray = obj.getJSONArray("groups");
+			groups = new ArrayList<Group>();
+			for (int i = 0; i < groupArray.length(); i++) {
+				// Establece un grupo con el id, name y description obtenido de
+				// cada
+				// JSONObject del JSONArray
+				Group group = new Group(groupArray.getJSONObject(i).getInt("id"),
+						groupArray.getJSONObject(i).getString("name"),
+						groupArray.getJSONObject(i).getString("description"));
+				if (group != null)
+					groups.add(group);
+			}
+		}
 		this.courses = new ArrayList<Integer>();
 		// this.setCourses(token);
 	}
@@ -144,6 +153,13 @@ public class EnrolledUser {
 		return this.groups;
 	}
 
+	/**
+	 * Función que almacena los cursos de un usuario matriculado
+	 * 
+	 * @param token
+	 *            token de usuario
+	 * @throws Exception
+	 */
 	public void setCourses(String token) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {

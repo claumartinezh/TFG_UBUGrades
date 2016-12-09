@@ -3,10 +3,8 @@ package model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.Map;
 import java.util.Set;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -38,8 +36,7 @@ public class Course implements Serializable {
 	private String summary;
 	public ArrayList<EnrolledUser> enrolledUsers;
 	public Set<String> roles; // roles que hay en el curso
-	// public Map<Integer, Group> groups;
-	public Set<String> groups;
+	public Set<String> groups; // grupos que hay en el curso
 
 	public Course(String token, JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
@@ -55,19 +52,7 @@ public class Course implements Serializable {
 			this.summary = obj.getString("summary");
 		this.enrolledUsers = new ArrayList<EnrolledUser>();
 		this.setEnrolledUsers(token, this.id);
-
-		//////////
-		// groups = new HashMap<>();
 	}
-
-	////////
-	/*
-	 * public void setGroups(Map<Integer, Group> groups) { this.groups = groups;
-	 * }
-	 * 
-	 * public List<Group> getGroups() { return new
-	 * ArrayList<Group>(groups.values()); }
-	 */
 
 	public int getId() {
 		return this.id;
@@ -120,6 +105,7 @@ public class Course implements Serializable {
 						}
 					}
 					this.setRoles(this.enrolledUsers);
+					this.setGroups(this.enrolledUsers);
 				}
 			} finally {
 				response.close();
@@ -140,19 +126,15 @@ public class Course implements Serializable {
 	}
 
 	/**
-	 * Función que crea una lista (set) de los roles que hay en el curso.
+	 * Función almacena en un set los roles que hay en el curso.
 	 * 
 	 * @param users
 	 *            usuarios matriculados en el curso
 	 */
 	public void setRoles(ArrayList<EnrolledUser> users) {
-		// Cargamos la lista de los usuarios
-		// ArrayList<String> nameUsers = new ArrayList<String>();
-		// Collections.sort(users, (o1, o2) ->
-		// o1.getFullName().compareTo(o2.getFullName()));
-
+		// Creamos el set de roles
 		roles = new HashSet<String>();
-		// recorremos la lista de usuarios
+		// Recorremos la lista de usuarios matriculados en el curso
 		for (int i = 0; i < users.size(); i++) {
 			// sacamos el rol del usuario
 			ArrayList<Role> roleArray = users.get(i).getRoles();
@@ -185,19 +167,24 @@ public class Course implements Serializable {
 	 *            usuarios del curso
 	 */
 	public void setGroups(ArrayList<EnrolledUser> users) {
-
+		// creamos el set de grupos
 		groups = new HashSet<String>();
-		// recorremos la lista de usuarios
+		// recorremos la lista de usuarios matriculados en el curso
 		for (int i = 0; i < users.size(); i++) {
 			// sacamos el grupo del usuario
 			ArrayList<Group> groupsArray = users.get(i).getGroups();
 			// cada grupo nuevo se añade al set de grupos
 			for (int j = 0; j < groupsArray.size(); j++) {
-				roles.add(groupsArray.get(j).getName());
+				groups.add(groupsArray.get(j).getName());
 			}
 		}
 	}
 
+	/**
+	 * Función para obtener los grupos que hay en el curso.
+	 * 
+	 * @return lista de grupos
+	 */
 	public ArrayList<String> getGroups() {
 		ArrayList<String> result = new ArrayList<String>();
 		Iterator<String> groupsIt = this.groups.iterator();

@@ -1,5 +1,12 @@
 package model;
 
+/**
+ * Clase Group para distinguir los grupos que hay en un curso, así como los
+ * grupos en los que se encuentra un usuario.
+ * 
+ * @author Claudia Martínez Herrero
+ *
+ */
 public class Group {
 	private int id;
 	private String name;

@@ -36,7 +36,7 @@ public class MoodleUser {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			HttpGet httpget = new HttpGet(UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
-					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_ID_USUARIO
+					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_INFO_USUARIO
 					+ "&field=email&values[0]=" + eMail);
 			CloseableHttpResponse response = httpclient.execute(httpget);
 
