@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+import java.util.Stack;
 
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -16,6 +17,9 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import controllers.UBUGrades;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Clase curso
@@ -37,6 +41,7 @@ public class Course implements Serializable {
 	public ArrayList<EnrolledUser> enrolledUsers;
 	public Set<String> roles; // roles que hay en el curso
 	public Set<String> groups; // grupos que hay en el curso
+	public ArrayList<GradeReportConfigurationLine> gradeReportConfigurationLines;
 
 	public Course(String token, JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
@@ -52,6 +57,7 @@ public class Course implements Serializable {
 			this.summary = obj.getString("summary");
 		this.enrolledUsers = new ArrayList<EnrolledUser>();
 		this.setEnrolledUsers(token, this.id);
+		this.setGradeReportConfigurationLines(token, this.id, this.enrolledUsers.get(0).getId());
 	}
 
 	public int getId() {
@@ -193,4 +199,351 @@ public class Course implements Serializable {
 		}
 		return result;
 	}
+
+	/**
+	 * Funcion que establece los GradeReportConfigurationLine de un usuario en
+	 * un curso. Esta función se usará para obtener todos los
+	 * GradeReportConfigurationLine del primer usuario matriculado y así sacar
+	 * la estructura del calificador del curso para después mostrarla como
+	 * TreeView en la vista
+	 * 
+	 * @param token
+	 *            token del profesor logueado
+	 * @param courseId
+	 *            curso del que se quieren cargar los datos
+	 * @param userId
+	 * @throws Exception
+	 */
+	public void setGradeReportConfigurationLines(String token, int courseId, int userId) throws Exception {
+		CloseableHttpClient httpclient = HttpClients.createDefault();
+		try {
+			String call = UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
+					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_TABLA_NOTAS + "&courseid="
+					+ courseId + "&userid=" + userId;
+			//System.out.println(call);
+			HttpGet httpget = new HttpGet(call);
+			CloseableHttpResponse response = httpclient.execute(httpget);
+			try {
+				String respuesta = EntityUtils.toString(response.getEntity());
+				JSONObject jsonArray = new JSONObject(respuesta);
+
+				// lista de GradeReportConfigurationLines
+				this.gradeReportConfigurationLines = new ArrayList<GradeReportConfigurationLine>();
+				// En esta pila sólo van a entrar Categorías. Se mantendrán en la pila mientran tengan descendencia. 
+				// Una vez añadida al árbol toda la descendencia de un nodo, este nodo se saca de la pila y se añade al árbol.
+				Stack<GradeReportConfigurationLine> deque = new Stack<GradeReportConfigurationLine>();
+
+				if (jsonArray != null) {
+					JSONArray tables = (JSONArray) jsonArray.get("tables");
+					JSONObject firstAlumn = (JSONObject) tables.get(0);
+					/*System.out.println("FA:");
+					System.out.println(firstAlumn);
+					System.out.println();*/
+					JSONArray tableData = (JSONArray) firstAlumn.getJSONArray("tabledata");
+					/*System.out.println("TableData:");
+					System.out.println(tableData);
+					System.out.println();*/
+					// El elemento table data tiene las líneas del configurador
+					// (que convertiremos a GradeReportConfigurationLines)
+					for (int i = 0; i < tableData.length(); i++) {
+						JSONObject tableDataElement = tableData.getJSONObject(i);
+						/*System.out.println("Leader or feedback:");
+						System.out.println(leaderOrFeedback);*/
+						// sea categoría o item, se saca de la misma manera el nivel del itemname
+						JSONObject itemname = tableDataElement.getJSONObject("itemname");
+						int actualLevel = getActualLevel(itemname.getString("class"));
+						int idLine = getIdLine(itemname.getString("id"));
+						/*System.out.println("");
+						System.out.println("   - Nivel de la línea: " + actualLevel);*/
+						// --- Si es un feedback (item o suma de calificaciones):
+						if(tableDataElement.isNull("leader")){
+							String nameContainer = itemname.getString("content");
+							String nameLine="";
+							String typeActivity = "";
+							boolean typeLine = false; // true si es un item, false si es una categoría
+							// Si es una actividad (assignment o quiz)
+							// Se reconocen por la etiqueta "<a"
+							if(nameContainer.substring(0, 2).equals("<a")){
+								//System.out.println("   - Es un assignment o quiz");
+								nameLine = getNameActivity(nameContainer);
+								if(assignmentOrQuiz(nameContainer).equals("assignment"))
+									typeActivity = "Assignment";
+								else if(assignmentOrQuiz(nameContainer).equals("quiz"))
+									typeActivity = "Quiz";
+								typeLine = true;
+							}else{
+								// Si es un item manual o suma de calificaciones
+								// Se reconocen por la etiqueta "<span"
+								//System.out.println("   - Es un item manual o suma de calificaciones");
+								nameLine = getNameManualItemOrEndCategory(nameContainer);
+								if(manualItemOrEndCategory(nameContainer).equals("manualItem")){
+									typeActivity = "ManualItem";
+									typeLine = true;
+								}
+								else if(manualItemOrEndCategory(nameContainer).equals("endCategory")){
+									typeActivity = "EndCategory";
+									typeLine = false;
+								}
+							}
+							/*
+							System.out.println("   - Nombre de la línea: " + nameLine);
+							System.out.println("   - Tipo : " + typeActivity);*/
+							
+							// Sacamos la nota (grade)
+							JSONObject gradeContainer = tableDataElement.getJSONObject("grade");
+							Float grade = Float.NaN;							
+							if(esDecimal(gradeContainer.getString("content"))){ // Si hay nota numérica
+								grade = Float.parseFloat(gradeContainer.getString("content"));
+								//System.out.println("   - Nota item: " + grade);
+							}/*else // Si no tiene nota registrada, se queda igual
+								System.out.println("   - No hay nota: " + grade);*/
+							
+							// Sacamos el porcentaje
+							JSONObject percentageContainer = tableDataElement.getJSONObject("percentage");
+							Float percentage = Float.NaN;
+							if(esDecimal(percentageContainer.getString("content"))){
+								percentage = Float.parseFloat(percentageContainer.getString("content"));
+								//System.out.println("   - Nota item: " + percentage);
+							}
+							/*else{
+								System.out.println("   - No hay nota porcentaje: " + percentage);
+							}*/
+							// Sacamos el peso
+							JSONObject weightContainer = tableDataElement.getJSONObject("weight");
+							Float weight = Float.NaN;
+							if(esDecimal(percentageContainer.getString("content"))){
+								weight = Float.parseFloat(percentageContainer.getString("content"));
+								//System.out.println("   - Nota item: " + weight);
+							}/*else{
+								//System.out.println("   - No hay peso: " + weight);
+							}*/
+							
+							// Sacamos el rango
+							JSONObject rangeContainer = tableDataElement.getJSONObject("range");
+							Float rangeMin = getRange(rangeContainer.getString("content"), true);
+							Float rangeMax = getRange(rangeContainer.getString("content"), false);
+							//System.out.println("   - Rango: " + rangeMin + "-" + rangeMax);
+							if(typeLine){ // Si es un item
+								// Añadimos la linea actual
+								GradeReportConfigurationLine actualLine = new GradeReportConfigurationLine(idLine, nameLine,
+										actualLevel, typeLine, weight, rangeMin, rangeMax);
+								if(!deque.isEmpty()){
+									deque.lastElement().addChild(actualLine);
+								}
+								//Añadimos el elemento a la lista como item
+								this.gradeReportConfigurationLines.add(actualLine);
+							}else{
+								// Obtenemos el elemento cabecera de la pila
+								GradeReportConfigurationLine actualLine = deque.pop();
+								//Establecemos los valores restantes
+								actualLine.setWeight(weight);
+								actualLine.setRangeMin(rangeMin);
+								actualLine.setRangeMax(rangeMax);
+								//Modificamos la cabecera de esta suma, para dejarla como una categoria completa
+								updateGRCLList(actualLine);
+							}
+							
+							
+							
+							/*
+							System.out.println(feedback);
+							System.out.println("");
+							System.out.println(itemname);*/
+						
+						// --- Si es una categoría
+						}else{ 
+							//System.out.println("   - Tipo : Categoría");
+							String nameLine = getNameCategorie(itemname.getString("content"));
+
+							//System.out.println("   - Nombre de la línea: " + nameLine);
+							
+							// Añadimos la cabecera de la categoria a la pila
+							GradeReportConfigurationLine actualLine = new GradeReportConfigurationLine(idLine, nameLine,
+									actualLevel, false);
+							//Lo añadimos como hijo de la categoria anterior
+							if(!deque.isEmpty()){
+								//System.out.println(deque.lastElement().getName());
+								deque.lastElement().addChild(actualLine);
+								
+							}
+							
+							//Añadimos esta cabecera a la pila
+							deque.add(actualLine);
+							//Añadimos el elemento a la lista como cabecera por ahora
+							this.gradeReportConfigurationLines.add(actualLine);
+						}
+					} // End for
+				} // End if
+			} finally {
+				response.close();
+			}
+		} finally {
+			httpclient.close();
+		}
+	}
+
+	/**
+	 * Función para sacar el nombre de una categoría
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public String getNameCategorie(String data) {
+		String result = "";
+		// busco el final de la cadena única a partir de la cual empieza el
+		// nombre
+		// de la categoría
+		int begin = data.lastIndexOf("/>") + 2;
+		// el nombre termina al final de todo el texto
+		int end = data.length();
+		// me quedo con la cadena entre esos índices
+		result = data.substring(begin, end);
+
+		return result;
+	}
+
+	/**
+	 * Función para sacar el nombre de una actividad
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public String getNameActivity(String data) {
+		int begin = data.indexOf(" />") + 3;
+		int end = data.indexOf("</a>");
+		return data.substring(begin, end);
+	}
+
+	/**
+	 * Función para sacar el nombre de un item manual o un cierre de categoría
+	 * 
+	 * @param data
+	 * @return
+	 */
+	public String getNameManualItemOrEndCategory(String data) {
+		int begin = data.lastIndexOf("/>") + 2;
+		int end = data.indexOf("</span>");
+		return data.substring(begin, end);
+	}
+
+	/**
+	 * Función que obtiene el id del item
+	 * 
+	 * @param data
+	 * @return id de un item
+	 */
+	public int getIdLine(String data) {
+		String[] matrix = data.split("_");
+		return Integer.parseInt(matrix[1]);
+	}
+
+	/**
+	 * Función que obtiene el nivel del GradeReportConfigurationLine que está
+	 * siendo leída.
+	 * 
+	 * @param data
+	 * @return nivel de la línea
+	 */
+	public int getActualLevel(String data) {
+		int result = 0;
+		result = Integer.parseInt(data.substring(5, data.indexOf(" ") ));
+		return (int) result;
+	}
+
+	/**
+	 * Función que obtiene el tipo de un GradeReportConfigurationLine (actividad
+	 * o categoría)
+	 * 
+	 * @param data
+	 * @return tipo de línea (cebecera de categoría, suma de calificaciones o
+	 *         item)
+	 */
+	public boolean getTypeLine(String data) {
+		String[] matrix = data.split(" ");
+		return matrix[2].equals("item");
+	}
+
+	/**
+	 * Función para comprobar si la linea es una suma de calificaciones de
+	 * categoría (un cierre de categoría)
+	 * 
+	 * @param data
+	 * @return true si la línea es una suma de calificaciones, false si no
+	 */
+	public boolean getBaggtLine(String data) {
+		String[] matrix = data.split(" ");
+		return matrix[3].equals("baggt");
+	}
+
+	/**
+	 * Función que devuelve el rango mínimo o máximo
+	 * 
+	 * @param data
+	 * @param option
+	 * @return rango máximo o mínimo
+	 */
+	public float getRange(String data, boolean option) {
+		String[] ranges = data.split("&ndash;");
+		if (option) // true = rango mínimo
+			return Float.parseFloat(ranges[0]);
+		else // false = rango máximo
+			return Float.parseFloat(ranges[1]);
+	}
+
+	/**
+	 * Sustituimos el elemento de la lista que es una cabecera por el elemento
+	 *  que es una categoria completa con todos sus atributos
+	 * @param line
+	 */
+	public void updateGRCLList(GradeReportConfigurationLine line){
+		for(int i = 0; i<this.gradeReportConfigurationLines.size();i++){
+			if(this.gradeReportConfigurationLines.get(i).getId() == line.getId()){
+				this.gradeReportConfigurationLines.set(i, line);
+			}
+		}
+	}
+	
+	/**
+	 * Función para saber si una cadena de texto contiene un número decimal.
+	 * @param cad texto 
+	 * @return true si hay un decimal, false si no
+	 */
+	public boolean esDecimal(String cad){
+		 try{
+			 Float.parseFloat(cad);
+			 return true;
+		 }catch(NumberFormatException nfe)	 {
+			 return false;
+		 }
+	 }
+	
+	/**
+	 * Función que diferencia si la actividad es un quiz o un assignment.
+	 * @param nameContainer
+	 * @return true si es un assignment, false si es un quiz
+	 */
+	private String assignmentOrQuiz(String data) {
+		String url = data.substring(data.lastIndexOf("href="), data.indexOf("?id="));
+		if(url.contains("mod/assign")){
+			return "assignment";
+		}else if(url.contains("mod/quiz"))
+			return "quiz";
+		else
+			return "";
+	}
+	/**
+	 * Función que diferencia si la línea es un item manual o un cierre de categoría.
+	 * @param data
+	 * @return
+	 */
+	private String manualItemOrEndCategory(String data){
+		String url = data.substring(data.lastIndexOf("src="), data.indexOf("/>"));
+		if(url.contains("i/manual_item")){
+			return "manualItem";
+		}else if(url.contains("i/agg_sum"))
+			return "endCategory";
+		else
+			return "";
+	}
 }
+

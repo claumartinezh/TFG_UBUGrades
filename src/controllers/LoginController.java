@@ -4,6 +4,7 @@ package controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -26,6 +27,8 @@ public class LoginController {
 	private PasswordField txtPassword;
 	@FXML
 	private TextField txtHost;
+	@FXML
+	private Button btnLogin;
 
 	/**
 	 * Función para hacer el login de usuario con el botón Entrar. Si el usuario
@@ -39,7 +42,6 @@ public class LoginController {
 		UBUGrades.host = txtHost.getText();
 		UBUGrades.session = new Session(txtUsername.getText(), txtPassword.getText());
 		Boolean correcto = true;
-
 		try {
 			UBUGrades.session.setToken();
 		} catch (Exception e) {
@@ -47,18 +49,22 @@ public class LoginController {
 		}
 		// Si el login es correcto
 		if (correcto) {
+			System.out.println(" Login Correcto");
 			// Accedemos a la siguiente ventana
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
+			//UBUGrades.stage.getScene() setCursor(Cursor.WAIT);
+			UBUGrades.stage.close();
+			System.out.println("Accediendo a UBUGrades...");
 			UBUGrades.stage = new Stage();
 			Parent root = loader.load();
+			//root.setCursor(Cursor.WAIT);
 			Scene scene = new Scene(root);
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			UBUGrades.stage.setScene(scene);
 			UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+			UBUGrades.stage.setTitle("UBUGrades");
 			UBUGrades.stage.show();
-			lblStatus.setText("");
-			System.out.println(" Login Correcto");
+			lblStatus.setText("");			
 		} else {
 			lblStatus.setText(" Usuario incorrecto");
 			System.out.println("Login Incorrecto");
@@ -77,5 +83,4 @@ public class LoginController {
 		txtUsername.setText("");
 		txtPassword.setText("");
 	}
-
 }

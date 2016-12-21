@@ -33,5 +33,10 @@
 				<Cursor fx:constant="HAND" />
 			</cursor>
 		</Button>
+      <Label fx:id="lblNoSelect" layoutX="308.0" layoutY="520.0" prefWidth="175.0" textFill="#e11010">
+         <font>
+            <Font size="15.0" />
+         </font>
+      </Label>
 	</children>
 </AnchorPane>

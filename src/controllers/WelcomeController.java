@@ -31,6 +31,8 @@ public class WelcomeController implements Initializable {
 	@FXML
 	public ListView<String> listCourses;
 	ObservableList<String> list;
+	@FXML
+	public Label lblNoSelect;
 
 	/**
 	 * Función initialize. Muestra la lista de cursos del usuario introducido.
@@ -71,6 +73,7 @@ public class WelcomeController implements Initializable {
 	 * @throws Exception
 	 */
 	public void EnterCourse(ActionEvent event) throws Exception {
+		try{
 		// Guardamos en una variable el curso seleccionado por el usuario
 		String selectedCourse = listCourses.getSelectionModel().getSelectedItem();
 		UBUGrades.session.setCourse(getCourseByString(selectedCourse));
@@ -79,15 +82,23 @@ public class WelcomeController implements Initializable {
 		// Accedemos a la siguiente ventana:
 		FXMLLoader loader = new FXMLLoader();
 		loader.setLocation(getClass().getResource("./../view/Main.fxml"));
+		UBUGrades.stage.close();
 		UBUGrades.stage = new Stage();
 		Parent root = loader.load();
 		Scene scene = new Scene(root);
 		// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		UBUGrades.stage.setScene(scene);
 		UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+		UBUGrades.stage.setTitle("UBUGrades");
 		UBUGrades.stage.show();
-		// lblStatus.setText("");
-		System.out.println("-- Entrando curso");
+		lblNoSelect.setText("");
+		System.out.println("-- Entrando al curso");
+		}
+		catch(Exception e){
+			lblNoSelect.setText("Debe seleccionar un curso");
+			System.out.println("Debe seleccionar un curso");
+		}
+		
 	}
 
 	/**

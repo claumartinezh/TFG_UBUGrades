@@ -16,7 +16,9 @@ public class MoodleOptions {
 	// Devuelve los usuarios matriculados en un curso
 	public static final String OBTENER_USUARIOS_MATRICULADOS = "core_enrol_get_enrolled_users";
 	// Devuelve todas las categorías y elementos evaluables de un curso
-	public static final String OBTENER_GRADES_TABLE = "gradereport_user_get_grades_table";
-	
-	//public static final String OBTENER_CONTENIDOS = "core_course_get_contents";
+	public static final String OBTENER_TABLA_NOTAS = "gradereport_user_get_grades_table";
+	// Devuelve información sobre los assignments (tareas) que hay en un curso
+	public static final String OBTENER_ASSIGNMENTS = "mod_assign_get_assignments";
+	// Devuelve información sobre los quizs (cuestionarios) que hay en un curso
+	public static final String OBTENER_QUIZZES = "mod_quiz_get_quizzes_by_courses";
 }

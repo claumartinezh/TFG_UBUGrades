@@ -12,14 +12,22 @@ import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TreeItem;
+import javafx.scene.control.TreeView;
+import javafx.stage.Stage;
 import model.EnrolledUser;
+import model.GradeReportConfigurationLine;
 import model.Group;
 import model.Role;
 
@@ -39,10 +47,6 @@ public class MainController implements Initializable {
 	@FXML
 	public Label lblActualHost;
 
-	/*
-	 * @FXML private javafx.scene.control.Button btnExit;
-	 */
-
 	@FXML
 	public ListView<String> listParticipants;
 	ObservableList<String> list;
@@ -54,15 +58,17 @@ public class MainController implements Initializable {
 	@FXML
 	public MenuButton slcGroup;
 	MenuItem[] groupMenuItems;
-
 	String filterRole = "Todos";
 	String filterGroup = "Todos";
 	String patternParticipants = "";
-
 	@FXML
 	public TextField tfdParticipants;
 	// @FXML
 	// public TextField tfdItems;
+
+	@FXML
+	public TreeView<String> tvwGradeReport;
+	ArrayList<TreeItem> gradeReportList;
 
 	/**
 	 * Función initialize. Muestra los usuarios matriculados en el curso.
@@ -83,8 +89,7 @@ public class MainController implements Initializable {
 			// Convertimos la lista a una lista de MenuItems para el MenuButton
 			ArrayList<MenuItem> rolesItemsList = new ArrayList<MenuItem>();
 			// En principio se van a mostrar todos los participantes con
-			// cualquier
-			// rol
+			// cualquier rol
 			MenuItem mi = (new MenuItem("Todos"));
 			// Añadimos el manejador de eventos al primer MenuItem
 			mi.setOnAction(actionRole);
@@ -110,8 +115,7 @@ public class MainController implements Initializable {
 			// Convertimos la lista a una lista de MenuItems para el MenuButton
 			ArrayList<MenuItem> groupsItemsList = new ArrayList<MenuItem>();
 			// En principio se van a mostrar todos los participantes en
-			// cualquier
-			// grupo
+			// cualquier grupo
 			mi = (new MenuItem("Todos"));
 			// Añadimos el manejador de eventos al primer MenuItem
 			mi.setOnAction(actionGroup);
@@ -138,6 +142,31 @@ public class MainController implements Initializable {
 
 			// Inicializamos el listener del textField
 			tfdParticipants.setOnAction(inputParticipant());
+
+			////////////////////////////////////////////////////////
+			////////////////////////////////////////////////////////
+			//Mostramos la estructura en arbol del calificador
+			ArrayList<GradeReportConfigurationLine> grcl = (ArrayList<GradeReportConfigurationLine>) UBUGrades.session.getCourse().gradeReportConfigurationLines;
+			//Establecemos la raiz del Treeview
+			TreeItem<String> root = new TreeItem<String>(grcl.get(0).getName());
+			//Llamamos recursivamente para llenar el Treeview
+			for(int k = 0; k<grcl.get(0).getChildren().size();k++){
+				TreeItem<String> item = new TreeItem<String>(grcl.get(0).getChildren().get(k).getName());
+				root.getChildren().add(item);
+				root.setExpanded(true);
+				setTreeview(item,grcl.get(0).getChildren().get(k));
+			}
+			//Establecemos la raiz del treeview
+			tvwGradeReport.setRoot(root);
+			tvwGradeReport.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			//gradeReportList.add(grcl.get(grcl.size()).getName());
+			//tvwGradeReport = new TreeView<String>();
+			/*for(int k = 0;k<grcl.size();k++){
+				TreeItem<String> item= new TreeItem<String>(grcl.get(k).getName());
+				tvwGradeReport.setR
+			}*/
+			//tvwGradeReport.getTree
+			// tvwGradeReport.set
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -258,6 +287,7 @@ public class MainController implements Initializable {
 	 * seleccionado en los MenuButtons.
 	 */
 	public void filterParticipants() {
+
 		try {
 			boolean roleYes;
 			boolean groupYes;
@@ -320,5 +350,31 @@ public class MainController implements Initializable {
 			e.printStackTrace();
 		}
 		listParticipants.setItems(list);
+	}
+	/**
+	 * Función que rellena recursivamente el arbol de GradeReportConfigurationLines
+	 */
+	public void setTreeview(TreeItem<String> parent,GradeReportConfigurationLine line){
+		
+		/*Obtiene los hijos de la linea pasada por parametro
+		Los transforma en treeitems y los establece como hijos del
+		elemento treeItem equivalente de line*/
+		for(int j = 0; j<line.getChildren().size(); j++){
+			TreeItem<String> item = new TreeItem<String>(line.getChildren().get(j).getName());
+			parent.getChildren().add(item);
+			parent.setExpanded(true);
+			setTreeview(item, line.getChildren().get(j));
+		}	
+	}
+	
+	/**
+	 * Función para el botón "Salir". Cierra la aplicación.
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void CloseApplication(ActionEvent actionEvent) throws Exception {
+		System.out.println("Cerrando aplicación");
+		UBUGrades.stage.close();
 	}
 }

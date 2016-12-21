@@ -23,7 +23,7 @@ public class UBUGrades extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			System.out.println("Bienvenido a UBUGrades");
+			System.out.println("[Bienvenido a UBUGrades]");
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("./../view/Login.fxml"));
 			Parent root = loader.load();
@@ -33,6 +33,7 @@ public class UBUGrades extends Application {
 
 			stage.setScene(scene);
 			stage.getIcons().add(new Image("./img/logo_min.png"));
+			UBUGrades.stage.setTitle("UBUGrades");
 			stage.show();
 		} catch (Exception e) {
 			e.printStackTrace();
