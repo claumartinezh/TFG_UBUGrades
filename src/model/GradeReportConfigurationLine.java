@@ -12,7 +12,9 @@ public class GradeReportConfigurationLine {
 	private float rangeMin;
 	private float rangeMax;
 	private boolean type; // False = Category, True = Item
+	private String nameType;
 	private ArrayList<GradeReportConfigurationLine> children;
+	private Activity activity;
 	/**
 	 * Constructor de categorias
 	 * Se le añaden a posteriori los elementos de su suma de calificaciones
@@ -39,7 +41,7 @@ public class GradeReportConfigurationLine {
 	 * @param rangeMax
 	 */
 	public GradeReportConfigurationLine(int id, String name, int level, boolean type, float weight, float rangeMin,
-			float rangeMax) {
+			float rangeMax, String nameType) {
 		this.id = id;
 		this.name = name;
 		this.level = level;
@@ -47,6 +49,7 @@ public class GradeReportConfigurationLine {
 		this.type = type;
 		this.rangeMax = rangeMax;
 		this.rangeMin = rangeMin;
+		this.nameType= nameType;
 		this.children = new ArrayList<GradeReportConfigurationLine>();
 	}
 
@@ -77,7 +80,9 @@ public class GradeReportConfigurationLine {
 	public void setType(boolean type) {
 		this.type = type;
 	}
-
+	 public void setNameType(String nameType){
+		 this.nameType=nameType;
+	 }
 	public int getId() {
 		return this.id;
 	}
@@ -105,11 +110,18 @@ public class GradeReportConfigurationLine {
 	public boolean getType() {
 		return this.type;
 	}
+	
+	public String getNameType(){
+		return this.nameType;
+	}
+	
 	public void addChild(GradeReportConfigurationLine kid){
 		this.children.add(kid);
 	}
+	
 	public ArrayList<GradeReportConfigurationLine> getChildren(){
 		return this.children;
 	}
+	
 
 }

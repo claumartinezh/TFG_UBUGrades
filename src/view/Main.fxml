@@ -9,6 +9,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -41,29 +42,34 @@
                <font>
                   <Font size="11.0" />
                </font></Label>
-        <TextField fx:id="tfdParticipants" layoutX="7.0" layoutY="24.0" prefWidth="108.0" text="Filtro..." />
+        <TextField fx:id="tfdParticipants" layoutX="7.0" layoutY="20.0" prefWidth="108.0" text="Filtro..." />
         <MenuButton fx:id="slcGroup" layoutX="157.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Grupo">
                <font>
                   <Font size="10.0" />
                </font>
         </MenuButton>
-        <Label layoutX="14.0" layoutY="58.0" prefHeight="17.0" prefWidth="108.0" text="Nombre y Apellidos">
+        <Label layoutX="14.0" layoutY="47.0" prefHeight="17.0" prefWidth="108.0" text="Nombre y Apellidos">
                <font>
                   <Font size="11.0" />
                </font></Label>
-        <TreeView layoutX="1.0" layoutY="74.0" prefHeight="205.9998779296875" prefWidth="257.0" />
-        <Pane fx:id="PanelCateg" layoutX="1.0" layoutY="280.0" prefHeight="316.0" prefWidth="260.0">
+        <TreeView layoutX="1.0" layoutY="74.0" prefHeight="206.0" prefWidth="257.0" />
+        <Pane fx:id="PanelCateg" layoutX="1.0" layoutY="282.0" prefHeight="314.0" prefWidth="260.0">
           <children>
-            <Label layoutX="14.0" layoutY="6.0" text="Categorías / Items">
+            <Label layoutX="7.0" layoutY="6.0" text="Categorías / Items">
                      <font>
                         <Font size="11.0" />
                      </font></Label>
-            <TextField fx:id="tfdItems" layoutX="11.0" layoutY="28.0" prefHeight="25.0" prefWidth="108.0" text="Filtro..." />
+            <TextField fx:id="tfdItems" layoutX="7.0" layoutY="20.0" prefHeight="25.0" prefWidth="124.0" text="Filtro..." />
             <Separator layoutX="2.0" layoutY="0.0" prefWidth="257.0" />
-                  <TreeView fx:id="tvwGradeReport" layoutX="2.0" layoutY="58.0" prefHeight="255.0" prefWidth="257.0" />
+                  <TreeView fx:id="tvwGradeReport" layoutX="2.0" layoutY="47.0" prefHeight="266.0" prefWidth="257.0" />
+                  <MenuButton fx:id="slcType" layoutX="158.0" layoutY="20.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="88.0" text="Tipo">
+                     <font>
+                        <Font size="10.0" />
+                     </font>
+                  </MenuButton>
           </children>
         </Pane>
-            <ListView fx:id="listParticipants" layoutX="1.0" layoutY="77.0" prefHeight="200.0" prefWidth="257.0" />
+            <ListView fx:id="listParticipants" layoutX="1.0" layoutY="65.0" prefHeight="218.0" prefWidth="257.0" />
             <MenuButton fx:id="slcRole" layoutX="157.0" layoutY="30.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Rol">
                <font>
                   <Font size="10.0" />
