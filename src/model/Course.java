@@ -15,9 +15,10 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import controllers.UBUGrades;
-
 
 /**
  * Clase curso (asignatura). Cada curso tiene un calificador (compuesto por
@@ -38,7 +39,7 @@ public class Course implements Serializable {
 	public ArrayList<EnrolledUser> enrolledUsers;
 	public Set<String> roles; // roles que hay en el curso
 	public Set<String> groups; // grupos que hay en el curso
-	public ArrayList<GradeReportConfigurationLine> gradeReportConfigurationLines;
+	public ArrayList<GradeReportLine> gradeReportConfigurationLines;
 	public Set<String> typeActivities;
 
 	public Course(String token, JSONObject obj) throws Exception {
@@ -55,7 +56,8 @@ public class Course implements Serializable {
 			this.summary = obj.getString("summary");
 		this.enrolledUsers = new ArrayList<EnrolledUser>();
 		this.setEnrolledUsers(token, this.id);
-		this.setGradeReportConfigurationLines(token, this.id, this.enrolledUsers.get(0).getId());
+		// this.setGradeReportConfigurationLines(token, this.id,
+		// this.enrolledUsers.get(0).getId());
 	}
 
 	public int getId() {
@@ -216,35 +218,37 @@ public class Course implements Serializable {
 	 * @param userId
 	 * @throws Exception
 	 */
-	public void setGradeReportConfigurationLines(String token, int courseId, int userId) throws Exception {
+	public void setGradeReportConfigurationLines(String token, int userId) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			String call = UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
 					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_TABLA_NOTAS + "&courseid="
-					+ courseId + "&userid=" + userId;
-			// System.out.println(call);
+					+ this.getId() + "&userid=" + userId;
+			//System.out.println(call);
 			HttpGet httpget = new HttpGet(call);
 			CloseableHttpResponse response = httpclient.execute(httpget);
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
 				JSONObject jsonArray = new JSONObject(respuesta);
-
+				//System.out.println(jsonArray.toString());
 				// lista de GradeReportConfigurationLines
-				this.gradeReportConfigurationLines = new ArrayList<GradeReportConfigurationLine>();
+				this.gradeReportConfigurationLines = new ArrayList<GradeReportLine>();
 				// En esta pila sólo van a entrar Categorías. Se mantendrán en
 				// la pila mientran tengan descendencia.
 				// Una vez añadida al árbol toda la descendencia de un nodo,
 				// este nodo se saca de la pila y se añade al árbol.
-				Stack<GradeReportConfigurationLine> deque = new Stack<GradeReportConfigurationLine>();
+				Stack<GradeReportLine> deque = new Stack<GradeReportLine>();
 
 				if (jsonArray != null) {
 					JSONArray tables = (JSONArray) jsonArray.get("tables");
-					JSONObject firstAlumn = (JSONObject) tables.get(0);
-					/*
-					 * System.out.println("FA:");
-					 * System.out.println(firstAlumn); System.out.println();
-					 */
-					JSONArray tableData = (JSONArray) firstAlumn.getJSONArray("tabledata");
+					JSONObject alumn = (JSONObject) tables.get(0);
+
+					//System.out.println("FA:");
+					
+					//System.out.println(alumn);
+					//System.out.println();
+
+					JSONArray tableData = (JSONArray) alumn.getJSONArray("tabledata");
 					/*
 					 * System.out.println("TableData:");
 					 * System.out.println(tableData); System.out.println();
@@ -310,12 +314,13 @@ public class Course implements Serializable {
 							// Sacamos la nota (grade)
 							JSONObject gradeContainer = tableDataElement.getJSONObject("grade");
 							Float grade = Float.NaN;
-							if (esDecimal(gradeContainer.getString("content"))) { // Si
-																					// hay
-																					// nota
-																					// numérica
-								grade = Float.parseFloat(gradeContainer.getString("content"));
-								// System.out.println(" - Nota item: " + grade);
+							// Si hay nota numérica
+							//System.out.println(tableDataElement);
+							//System.out.println(gradeContainer.getString("content"));
+							if (!gradeContainer.getString("content").contains("-")) {
+								//grade = Float.parseFloat(gradeContainer.getString("content"));
+								grade = getNumber(gradeContainer.getString("content"));
+								//System.out.println(" - Nota item: " + grade);
 							} /*
 								 * else // Si no tiene nota registrada, se queda
 								 * igual System.out.println("   - No hay nota: "
@@ -325,8 +330,8 @@ public class Course implements Serializable {
 							// Sacamos el porcentaje
 							JSONObject percentageContainer = tableDataElement.getJSONObject("percentage");
 							Float percentage = Float.NaN;
-							if (esDecimal(percentageContainer.getString("content"))) {
-								percentage = Float.parseFloat(percentageContainer.getString("content"));
+							if (!percentageContainer.getString("content").contains("-")) {
+								percentage = getNumber(percentageContainer.getString("content"));
 								// System.out.println(" - Nota item: " +
 								// percentage);
 							}
@@ -338,8 +343,8 @@ public class Course implements Serializable {
 							// Sacamos el peso
 							JSONObject weightContainer = tableDataElement.getJSONObject("weight");
 							Float weight = Float.NaN;
-							if (esDecimal(percentageContainer.getString("content"))) {
-								weight = Float.parseFloat(percentageContainer.getString("content"));
+							if (!weightContainer.getString("content").contains("-")) {
+								weight =getNumber(weightContainer.getString("content"));
 								// System.out.println(" - Nota item: " +
 								// weight);
 							} /*
@@ -356,8 +361,8 @@ public class Course implements Serializable {
 							// + rangeMax);
 							if (typeLine) { // Si es un item
 								// Añadimos la linea actual
-								GradeReportConfigurationLine actualLine = new GradeReportConfigurationLine(idLine,
-										nameLine, actualLevel, typeLine, weight, rangeMin, rangeMax, typeActivity);
+								GradeReportLine actualLine = new GradeReportLine(idLine,
+										nameLine, actualLevel, typeLine, weight, rangeMin, rangeMax, grade, percentage, typeActivity);
 								if (!deque.isEmpty()) {
 									deque.lastElement().addChild(actualLine);
 								}
@@ -365,7 +370,7 @@ public class Course implements Serializable {
 								this.gradeReportConfigurationLines.add(actualLine);
 							} else {
 								// Obtenemos el elemento cabecera de la pila
-								GradeReportConfigurationLine actualLine = deque.pop();
+								GradeReportLine actualLine = deque.pop();
 								// Establecemos los valores restantes
 								actualLine.setWeight(weight);
 								actualLine.setRangeMin(rangeMin);
@@ -391,7 +396,7 @@ public class Course implements Serializable {
 							// nameLine);
 
 							// Añadimos la cabecera de la categoria a la pila
-							GradeReportConfigurationLine actualLine = new GradeReportConfigurationLine(idLine, nameLine,
+							GradeReportLine actualLine = new GradeReportLine(idLine, nameLine,
 									actualLevel, false);
 							// Lo añadimos como hijo de la categoria anterior
 							if (!deque.isEmpty()) {
@@ -423,7 +428,7 @@ public class Course implements Serializable {
 	 * 
 	 * @return lista de gradeReportConfigurationLines
 	 */
-	public ArrayList<GradeReportConfigurationLine> getGRCL() {
+	public ArrayList<GradeReportLine> getGRCL() {
 		return this.gradeReportConfigurationLines;
 	}
 
@@ -433,7 +438,7 @@ public class Course implements Serializable {
 	 * @param grcl
 	 *            gradeReportConfigurationLines
 	 */
-	public void setActivities(ArrayList<GradeReportConfigurationLine> grcl) {
+	public void setActivities(ArrayList<GradeReportLine> grcl) {
 		// Creamos el set de roles
 		typeActivities = new HashSet<String>();
 		// Recorremos la lista de usuarios matriculados en el curso
@@ -572,7 +577,7 @@ public class Course implements Serializable {
 	 * 
 	 * @param line
 	 */
-	public void updateGRCLList(GradeReportConfigurationLine line) {
+	public void updateGRCLList(GradeReportLine line) {
 		for (int i = 0; i < this.gradeReportConfigurationLines.size(); i++) {
 			if (this.gradeReportConfigurationLines.get(i).getId() == line.getId()) {
 				this.gradeReportConfigurationLines.set(i, line);
@@ -627,5 +632,21 @@ public class Course implements Serializable {
 			return "endCategory";
 		else
 			return "";
+	}
+	/**
+	 * Función que devuelve un número en formato Float si se encuentra en la cadena pasada
+	 * @param data
+	 * @return
+	 */
+	private Float getNumber(String data){
+		Pattern pattern = Pattern.compile("[0-9]{1,2},{1}[0-9]{1,2}");
+		//Pattern pattern = Pattern.compile("[0-9]{1,2}");
+		Matcher match = pattern.matcher(data);
+		if (match.find()) {
+			//System.out.println(data.substring(match.start(),match.end()));
+			return Float.parseFloat(data.substring(match.start(),match.end()).replace(",", "."));
+		}
+		return Float.NaN;
+		
 	}
 }

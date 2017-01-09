@@ -19,7 +19,7 @@ import controllers.UBUGrades;
  * @author Claudia Martínez Herrero
  *
  */
-public class EnrolledUser {
+public class EnrolledUser{
 	private int id;
 	// private String firstName;
 	// private String lastName;
@@ -187,5 +187,8 @@ public class EnrolledUser {
 
 	public ArrayList<Integer> getEnrolledCourses() {
 		return this.courses;
+	}
+	public String toString(){
+		return this.getFullName();
 	}
 }

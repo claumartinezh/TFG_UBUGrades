@@ -1,37 +1,42 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class GradeReportConfigurationLine {
+public class GradeReportLine {
 	// private ArrayList<Node> nodes;
 	private int id;
 	private String name;
 	private int level;
+	private float grade;
+	private float percentage;
 	private float weight;
 	private float rangeMin;
 	private float rangeMax;
 	private boolean type; // False = Category, True = Item
 	private String nameType;
-	private ArrayList<GradeReportConfigurationLine> children;
+	private ArrayList<GradeReportLine> children;
 	private Activity activity;
+
 	/**
-	 * Constructor de categorias
-	 * Se le añaden a posteriori los elementos de su suma de calificaciones
+	 * Constructor de categorias Se le añaden a posteriori los elementos de su
+	 * suma de calificaciones
+	 * 
 	 * @param id
 	 * @param name
 	 * @param level
 	 * @param type
 	 */
-	public GradeReportConfigurationLine(int id, String name, int level, boolean type){
+	public GradeReportLine(int id, String name, int level, boolean type) {
 		this.id = id;
 		this.name = name;
 		this.level = level;
 		this.type = type;
-		this.children = new ArrayList<GradeReportConfigurationLine>();
+		this.children = new ArrayList<GradeReportLine>();
 	}
+
 	/**
 	 * Constructor de items
+	 * 
 	 * @param id
 	 * @param name
 	 * @param level
@@ -40,8 +45,8 @@ public class GradeReportConfigurationLine {
 	 * @param rangeMin
 	 * @param rangeMax
 	 */
-	public GradeReportConfigurationLine(int id, String name, int level, boolean type, float weight, float rangeMin,
-			float rangeMax, String nameType) {
+	public GradeReportLine(int id, String name, int level, boolean type, float weight, float rangeMin, float rangeMax,
+			float grade, float percentage, String nameType) {
 		this.id = id;
 		this.name = name;
 		this.level = level;
@@ -49,8 +54,10 @@ public class GradeReportConfigurationLine {
 		this.type = type;
 		this.rangeMax = rangeMax;
 		this.rangeMin = rangeMin;
-		this.nameType= nameType;
-		this.children = new ArrayList<GradeReportConfigurationLine>();
+		this.grade = grade;
+		this.percentage = percentage;
+		this.nameType = nameType;
+		this.children = new ArrayList<GradeReportLine>();
 	}
 
 	public void setId(int id) {
@@ -65,6 +72,10 @@ public class GradeReportConfigurationLine {
 		this.level = level;
 	}
 
+	public void setGrade(float grade) {
+		this.grade = grade;
+	}
+
 	public void setWeight(float weight) {
 		this.weight = weight;
 	}
@@ -76,13 +87,19 @@ public class GradeReportConfigurationLine {
 	public void setRangeMin(float rangeMin) {
 		this.rangeMin = rangeMin;
 	}
+	
+	public void setPercentage(float percentage) {
+		this.percentage = percentage;
+	}
 
 	public void setType(boolean type) {
 		this.type = type;
 	}
-	 public void setNameType(String nameType){
-		 this.nameType=nameType;
-	 }
+
+	public void setNameType(String nameType) {
+		this.nameType = nameType;
+	}
+
 	public int getId() {
 		return this.id;
 	}
@@ -110,18 +127,27 @@ public class GradeReportConfigurationLine {
 	public boolean getType() {
 		return this.type;
 	}
-	
-	public String getNameType(){
+
+	public String getNameType() {
 		return this.nameType;
 	}
 	
-	public void addChild(GradeReportConfigurationLine kid){
+	public float getPercentage() {
+		return percentage;
+	}
+	
+	public float getGrade() {
+		return grade;
+	}
+
+	public void addChild(GradeReportLine kid) {
 		this.children.add(kid);
 	}
-	
-	public ArrayList<GradeReportConfigurationLine> getChildren(){
+
+	public ArrayList<GradeReportLine> getChildren() {
 		return this.children;
 	}
-	
-
+	public String toString(){
+		return this.getName();
+	}
 }

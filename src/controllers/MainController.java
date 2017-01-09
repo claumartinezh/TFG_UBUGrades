@@ -13,6 +13,7 @@ import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
@@ -22,7 +23,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import model.EnrolledUser;
-import model.GradeReportConfigurationLine;
+import model.GradeReportLine;
 import model.Group;
 import model.Role;
 
@@ -45,8 +46,8 @@ public class MainController implements Initializable {
 	@FXML // nº participantes
 	public Label lblCountParticipants;
 	@FXML // lista de nombres de participantes
-	public ListView<String> listParticipants;
-	ObservableList<String> list;
+	public ListView<EnrolledUser> listParticipants;
+	ObservableList<EnrolledUser> list;
 
 	@FXML // botón filtro por rol
 	public MenuButton slcRole;
@@ -63,8 +64,8 @@ public class MainController implements Initializable {
 
 	// En cuanto a los items de calificación
 	@FXML
-	public TreeView<String> tvwGradeReport;
-	ArrayList<TreeItem> gradeReportList;
+	public TreeView<GradeReportLine> tvwGradeReport;
+	ArrayList<GradeReportLine> gradeReportList;
 	String patternCalifications = "";
 
 	@FXML // entrada de filtro de actividades por patrón
@@ -80,10 +81,13 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
+			// Estableciendo calificador
+			UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
+					UBUGrades.session.getCourse().getEnrolledUsers().get(0).getId());
 			// Establecemos la lista de todos participantes
 			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
 			// Cargamos una lista con los nombres de los participantes
-			ArrayList<String> nameUsers = new ArrayList<String>();
+			ArrayList<EnrolledUser> nameUsers = new ArrayList<EnrolledUser>();
 
 			//////////////////////////////////////////////////////////////////////////
 			// Manejo de roles (MenuButton Rol):
@@ -138,7 +142,7 @@ public class MainController implements Initializable {
 			////////////////////////////////////////////////////////
 			// Añadimos todos los participantes a la lista de visualización
 			for (int j = 0; j < users.size(); j++) {
-				nameUsers.add(users.get(j).getFullName());
+				nameUsers.add(users.get(j));
 			}
 			list = FXCollections.observableArrayList(nameUsers);
 
@@ -200,9 +204,44 @@ public class MainController implements Initializable {
 			@Override
 			public void handle(Event event) {
 				// IMPLEMENTAR
-				ObservableList<String> selectedItems = listParticipants.getSelectionModel().getSelectedItems();
-				for (String s : selectedItems) {
-					System.out.println("selected item " + s);
+				ObservableList<EnrolledUser> selectedParticipants = listParticipants.getSelectionModel()
+						.getSelectedItems();
+				ObservableList<TreeItem<GradeReportLine>> selectedGRL = tvwGradeReport.getSelectionModel()
+						.getSelectedItems();
+				if (selectedGRL.isEmpty()) {
+					// Si no hay GRLine seleccionado, seleccionamos el curso
+					// entero
+					selectedGRL.add(tvwGradeReport.getRoot());
+				}
+				//Por cada participante seleccionado
+				for (EnrolledUser actualUser : selectedParticipants) {
+					//Establecemos el configurador del curso con este usuario
+					try {
+						UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
+								actualUser.getId());
+					} catch (Exception e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					System.out.println("Participante:" + actualUser);
+					System.out.println(" -Id:" + actualUser.getId());
+		
+					for (TreeItem<GradeReportLine> structTree : selectedGRL) {
+						for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
+							//Por cada Line que haya seleccionado, lo buscamos en la estructura y
+							// obtenemos los valores necesarios
+							//TODO Pintar grafico desde aqui
+							if (structTree.getValue().getId() == actualLine.getId()) {
+								
+								System.out.println(" " + actualLine.getName());
+								System.out.println("  -Id Linea: " + actualLine.getId());
+								System.out.println("  -Nota: " + actualLine.getGrade());
+								System.out.println("  -Tipo: " + actualLine.getNameType());
+								System.out.println("  -Peso: " + actualLine.getWeight());
+								System.out.println("  -Porcentaje: " + actualLine.getPercentage());
+							}
+						}
+					}
 				}
 				System.out.println();
 			}
@@ -214,13 +253,12 @@ public class MainController implements Initializable {
 
 		////////////////////////////////////////////////////////
 		// Mostramos la estructura en arbol del calificador
-		ArrayList<GradeReportConfigurationLine> grcl = (ArrayList<GradeReportConfigurationLine>) UBUGrades.session
-				.getCourse().getGRCL();
+		ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getCourse().getGRCL();
 		// Establecemos la raiz del Treeview
-		TreeItem<String> root = new TreeItem<String>(grcl.get(0).getName());
+		TreeItem<GradeReportLine> root = new TreeItem<GradeReportLine>(grcl.get(0));
 		// Llamamos recursivamente para llenar el Treeview
 		for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
-			TreeItem<String> item = new TreeItem<String>(grcl.get(0).getChildren().get(k).getName());
+			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
 			root.getChildren().add(item);
 			root.setExpanded(true);
 			setTreeview(item, grcl.get(0).getChildren().get(k));
@@ -238,11 +276,42 @@ public class MainController implements Initializable {
 			@Override
 			public void handle(Event event) {
 				// IMPLEMENTAR
-				ObservableList<TreeItem<String>> selectedItems = tvwGradeReport.getSelectionModel().getSelectedItems();
-				for (TreeItem<String> s : selectedItems) {
-					System.out.println("selected item " + s.getValue());
+				ObservableList<EnrolledUser> selectedParticipants = listParticipants.getSelectionModel()
+						.getSelectedItems();
+				ObservableList<TreeItem<GradeReportLine>> selectedGRL = tvwGradeReport.getSelectionModel()
+						.getSelectedItems();
+				if (selectedParticipants.isEmpty()) {
+					// Si no hay participante seleccionado, seleccionamos todos
+					System.out.println("No hay participante seleccionado");
+					selectedGRL.add(tvwGradeReport.getRoot());
+				} else {
+					for (EnrolledUser actualUser : selectedParticipants) {
+						try {
+							UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
+									actualUser.getId());
+						} catch (Exception e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						System.out.println("Participante:" + actualUser);
+						System.out.println(" -Id:" + actualUser.getId());
+						for (TreeItem<GradeReportLine> structTree : selectedGRL) {
+							for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
+								if (structTree.getValue().getId() == actualLine.getId()) {
+									
+									System.out.println(" " + actualLine.getName());
+									System.out.println("  -Id Linea: " + actualLine.getId());
+									System.out.println("  -Nota: " + actualLine.getGrade());
+									System.out.println("  -Tipo: " + actualLine.getNameType());
+									System.out.println("  -Peso: " + actualLine.getWeight());
+									System.out.println("  -Porcentaje: " + actualLine.getPercentage());
+								}
+							}
+						}
+					}
 				}
 				System.out.println();
+
 			}
 		});
 		System.out.println("-- Mostrando Calificador");
@@ -348,7 +417,7 @@ public class MainController implements Initializable {
 			boolean patternYes;
 			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
 			// Cargamos la lista de los roles
-			ArrayList<String> nameUsers = new ArrayList<String>();
+			ArrayList<EnrolledUser> nameUsers = new ArrayList<EnrolledUser>();
 			// Obtenemos los participantes que tienen el rol elegido
 			for (int i = 0; i < users.size(); i++) {
 				// Filtrado por rol:
@@ -391,7 +460,7 @@ public class MainController implements Initializable {
 				}
 				// Si el usuario se corresponde con los filtros
 				if (groupYes && roleYes && patternYes)
-					nameUsers.add(users.get(i).getFullName());
+					nameUsers.add(users.get(i));
 			}
 			list = FXCollections.observableArrayList(nameUsers);
 			/*
@@ -413,7 +482,7 @@ public class MainController implements Initializable {
 	 * @param parent
 	 * @param line
 	 */
-	public void setTreeview(TreeItem<String> parent, GradeReportConfigurationLine line) {
+	public void setTreeview(TreeItem<GradeReportLine> parent, GradeReportLine line) {
 
 		/*
 		 * Obtiene los hijos de la linea pasada por parametro Los transforma en
@@ -421,7 +490,7 @@ public class MainController implements Initializable {
 		 * equivalente de line
 		 */
 		for (int j = 0; j < line.getChildren().size(); j++) {
-			TreeItem<String> item = new TreeItem<String>(line.getChildren().get(j).getName());
+			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(line.getChildren().get(j));
 			parent.getChildren().add(item);
 			parent.setExpanded(true);
 			setTreeview(item, line.getChildren().get(j));
@@ -480,22 +549,21 @@ public class MainController implements Initializable {
 	 */
 	public void filterCalifications() {
 		try {
-			ArrayList<GradeReportConfigurationLine> grcl = (ArrayList<GradeReportConfigurationLine>) UBUGrades.session
-					.getCourse().getGRCL();
+			ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getCourse().getGRCL();
 			// Establecemos la raiz del Treeview
-			TreeItem<String> root = new TreeItem<String>(grcl.get(0).getName());
+			TreeItem<GradeReportLine> root = new TreeItem<GradeReportLine>(grcl.get(0));
 			// Llamamos recursivamente para llenar el Treeview
 			if (filterType.equals("Todos") && patternCalifications.equals("")) {
 				// Sin filtro y sin patrón
 				for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
-					TreeItem<String> item = new TreeItem<String>(grcl.get(0).getChildren().get(k).getName());
+					TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
 					root.getChildren().add(item);
 					root.setExpanded(true);
 					setTreeview(item, grcl.get(0).getChildren().get(k));
 				}
 			} else { // Con filtro
 				for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
-					TreeItem<String> item = new TreeItem<String>(grcl.get(0).getChildren().get(k).getName());
+					TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
 					boolean activityYes = false;
 					if (grcl.get(0).getChildren().get(k).getNameType().equals(filterType)
 							|| filterType.equals("Todos")) {
@@ -533,7 +601,8 @@ public class MainController implements Initializable {
 	 * @param parent
 	 * @param line
 	 */
-	public void setTreeviewFilter(TreeItem<String> root, TreeItem<String> parent, GradeReportConfigurationLine line) {
+	public void setTreeviewFilter(TreeItem<GradeReportLine> root, TreeItem<GradeReportLine> parent,
+			GradeReportLine line) {
 
 		/*
 		 * Obtiene los hijos de la linea pasada por parametro Los transforma en
@@ -541,7 +610,7 @@ public class MainController implements Initializable {
 		 * equivalente de line
 		 */
 		for (int j = 0; j < line.getChildren().size(); j++) {
-			TreeItem<String> item = new TreeItem<String>(line.getChildren().get(j).getName());
+			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(line.getChildren().get(j));
 			boolean activityYes = false;
 			if (line.getChildren().get(j).getNameType().equals(filterType) || filterType.equals("Todos")) {
 				activityYes = true;
@@ -559,6 +628,10 @@ public class MainController implements Initializable {
 			parent.setExpanded(true);
 			setTreeviewFilter(root, item, line.getChildren().get(j));
 		}
+
+	}
+
+	public void showGraphics() {
 
 	}
 
