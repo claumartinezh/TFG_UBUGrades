@@ -1,19 +1,38 @@
 package controllers;
 
+import java.awt.Desktop;
+import java.io.File;
+import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.imageio.ImageIO;
+
+import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
+import com.sun.javafx.application.HostServicesDelegate;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.Event;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuButton;
@@ -22,6 +41,11 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
+import javafx.scene.image.Image;
+import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import model.EnrolledUser;
 import model.GradeReportLine;
 import model.Group;
@@ -35,6 +59,8 @@ import model.Role;
  */
 public class MainController implements Initializable {
 
+	@FXML
+	public AnchorPane canvas;
 	@FXML // curso actual
 	public Label lblActualCourse;
 	@FXML // usuario actual
@@ -56,14 +82,16 @@ public class MainController implements Initializable {
 	@FXML // botón filtro por grupo
 	public MenuButton slcGroup;
 	MenuItem[] groupMenuItems;
-	String filterRole = "Todos";
-	String filterGroup = "Todos";
-	String patternParticipants = "";
+
 	@FXML // entrada de filtro de usuarios por patrón
 	public TextField tfdParticipants;
 
-	// En cuanto a los items de calificación
-	@FXML
+	String filterRole = "Todos";
+	String filterGroup = "Todos";
+	String patternParticipants = "";
+
+	// En cuanto a actividades del curso:
+	@FXML // vista en árbol de actividades
 	public TreeView<GradeReportLine> tvwGradeReport;
 	ArrayList<GradeReportLine> gradeReportList;
 	String patternCalifications = "";
@@ -75,12 +103,26 @@ public class MainController implements Initializable {
 	MenuItem[] typeMenuItems;
 	String filterType = "Todos";
 
+	// En cuanto al el gráfico:
+	@FXML
+	private LineChart<String, Number> lineChart;
+	@FXML
+	private CategoryAxis xAxis;
+	@FXML
+	private NumberAxis yAxis;
+
+	@FXML // Media
+	private CheckBox checkAverage;
+	private XYChart.Series<String, Number> average;
+
 	/**
-	 * Función initialize. Muestra los usuarios matriculados en el curso.
+	 * Función initialize. Muestra los usuarios matriculados en el curso, así
+	 * como las actividades de las que se compone.
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
+			// canvas.getStylesheets().add("@../config/style.css");
 			// Estableciendo calificador
 			UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
 					UBUGrades.session.getCourse().getEnrolledUsers().get(0).getId());
@@ -187,6 +229,27 @@ public class MainController implements Initializable {
 			 */
 			// tvwGradeReport.getTree
 			// tvwGradeReport.set
+			average = new XYChart.Series<String, Number>();
+			average.setName("Media");
+			/*
+			 * try {
+			 * UBUGrades.session.getCourse().setGradeReportConfigurationLines(
+			 * UBUGrades.session.getToken(), actualUser.getId()); } catch
+			 * (Exception e) { e.printStackTrace(); }
+			 */
+			// TODO: calcular la media de la clase
+			/*
+			 * for (GradeReportLine actualLine :
+			 * UBUGrades.session.getCourse().getGRCL()) { float allGrade = 0;
+			 * //Media de la actividad int count =1; for (EnrolledUser
+			 * actualUser : UBUGrades.session.getCourse().enrolledUsers) {
+			 * if(actualLine.getGrade() != Float.NaN){ float calculatedGrade =
+			 * (actualLine.getGrade() / actualLine.getRangeMax()) * 10;
+			 * count+=1; allGrade+=calculatedGrade; } } average.getData()
+			 * .add(new XYChart.Data<String, Number>(actualLine.getName(),
+			 * allGrade/count)); }
+			 */
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -198,12 +261,12 @@ public class MainController implements Initializable {
 		// Al clickar en la lista, recalculamos el número de elementos
 		// seleccionados
 		listParticipants.setOnMouseClicked(new EventHandler<Event>() {
-			// TODO
 			// Manejador que llama a la función de mostrar gráfico de los
 			// elementos selecionados
 			@Override
 			public void handle(Event event) {
-				// IMPLEMENTAR
+				// canvas.getStylesheets().clear();
+				// canvas.getStylesheets().add("@../config/style.css");
 				ObservableList<EnrolledUser> selectedParticipants = listParticipants.getSelectionModel()
 						.getSelectedItems();
 				ObservableList<TreeItem<GradeReportLine>> selectedGRL = tvwGradeReport.getSelectionModel()
@@ -213,36 +276,60 @@ public class MainController implements Initializable {
 					// entero
 					selectedGRL.add(tvwGradeReport.getRoot());
 				}
-				//Por cada participante seleccionado
+				// Por cada participante seleccionado
+				// Recalculamos el gráfico
+				lineChart.getData().clear();
 				for (EnrolledUser actualUser : selectedParticipants) {
-					//Establecemos el configurador del curso con este usuario
+					// Establecemos el configurador del curso con este usuario
 					try {
 						UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
 								actualUser.getId());
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
-					}
-					System.out.println("Participante:" + actualUser);
-					System.out.println(" -Id:" + actualUser.getId());
-		
+					} /*
+						 * System.out.println();
+						 * System.out.println("Participante:" + actualUser);
+						 * System.out.println(" -Id:" + actualUser.getId());
+						 */
+
+					// Mostramos el gráfico
+					XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+					series.setName(actualUser.getFullName());
 					for (TreeItem<GradeReportLine> structTree : selectedGRL) {
 						for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
-							//Por cada Line que haya seleccionado, lo buscamos en la estructura y
-							// obtenemos los valores necesarios
-							//TODO Pintar grafico desde aqui
+							// Por cada actividad que haya seleccionada,
+							// lo buscamos en la estructura y obtenemos
+							// los valores necesarios
 							if (structTree.getValue().getId() == actualLine.getId()) {
-								
-								System.out.println(" " + actualLine.getName());
-								System.out.println("  -Id Linea: " + actualLine.getId());
-								System.out.println("  -Nota: " + actualLine.getGrade());
-								System.out.println("  -Tipo: " + actualLine.getNameType());
-								System.out.println("  -Peso: " + actualLine.getWeight());
-								System.out.println("  -Porcentaje: " + actualLine.getPercentage());
+								float calculatedGrade = actualLine.getGrade();
+								// Al cambiar el rango a String ya no se puede hacer este cálculo
+								//float calculatedGrade = (actualLine.getGrade() / actualLine.getRangeMax()) * 10;
+								series.getData()
+										.add(new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
+								/*
+								 * System.out.println(" " +
+								 * actualLine.getName());
+								 * System.out.println("  -Id Linea: " +
+								 * actualLine.getId());
+								 * System.out.println("  -Nota: " +
+								 * actualLine.getGrade());
+								 * System.out.println("  -Tipo: " +
+								 * actualLine.getNameType());
+								 * System.out.println("  -Peso: " +
+								 * actualLine.getWeight());
+								 * System.out.println("  -Porcentaje: " +
+								 * actualLine.getPercentage());
+								 */
 							}
 						}
 					}
+					lineChart.getData().add(series);
 				}
+				/*
+				 * if(checkAverage.isSelected())
+				 * lineChart.getData().add(average);
+				 */
 				System.out.println();
 			}
 		});
@@ -270,12 +357,12 @@ public class MainController implements Initializable {
 		// Al clickar en la lista, recalculamos el número de elementos
 		// seleccionados
 		tvwGradeReport.setOnMouseClicked(new EventHandler<Event>() {
-			// TODO
 			// Manejador que llama a la función de mostrar gráfico de los
 			// elementos selecionados
 			@Override
 			public void handle(Event event) {
-				// IMPLEMENTAR
+				// canvas.getStylesheets().clear();
+				// canvas.getStylesheets().add("@../config/style2.css");
 				ObservableList<EnrolledUser> selectedParticipants = listParticipants.getSelectionModel()
 						.getSelectedItems();
 				ObservableList<TreeItem<GradeReportLine>> selectedGRL = tvwGradeReport.getSelectionModel()
@@ -285,6 +372,7 @@ public class MainController implements Initializable {
 					System.out.println("No hay participante seleccionado");
 					selectedGRL.add(tvwGradeReport.getRoot());
 				} else {
+					lineChart.getData().clear();
 					for (EnrolledUser actualUser : selectedParticipants) {
 						try {
 							UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
@@ -293,25 +381,47 @@ public class MainController implements Initializable {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						System.out.println("Participante:" + actualUser);
-						System.out.println(" -Id:" + actualUser.getId());
+						/*
+						 * System.out.println("Participante:" + actualUser);
+						 * System.out.println(" -Id:" + actualUser.getId());
+						 */
+						XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+						series.setName(actualUser.getFullName());
 						for (TreeItem<GradeReportLine> structTree : selectedGRL) {
 							for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
 								if (structTree.getValue().getId() == actualLine.getId()) {
-									
-									System.out.println(" " + actualLine.getName());
-									System.out.println("  -Id Linea: " + actualLine.getId());
-									System.out.println("  -Nota: " + actualLine.getGrade());
-									System.out.println("  -Tipo: " + actualLine.getNameType());
-									System.out.println("  -Peso: " + actualLine.getWeight());
-									System.out.println("  -Porcentaje: " + actualLine.getPercentage());
+									float calculatedGrade = actualLine.getGrade();
+									// Al cambiar el rango a String ya no se puede hacer este cálculo
+									//float calculatedGrade = (actualLine.getGrade() / actualLine.getRangeMax()) * 10;
+									// System.out.println(calculatedGrade);
+									series.getData().add(
+											new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
+									/*
+									 * System.out.println(" " +
+									 * actualLine.getName());
+									 * System.out.println("  -Id Linea: " +
+									 * actualLine.getId());
+									 * System.out.println("  -Nota: " +
+									 * actualLine.getGrade());
+									 * System.out.println("  -Tipo: " +
+									 * actualLine.getNameType());
+									 * System.out.println("  -Peso: " +
+									 * actualLine.getWeight());
+									 * System.out.println("  -Porcentaje: " +
+									 * actualLine.getPercentage());
+									 */
 								}
+
 							}
 						}
+						lineChart.getData().add(series);
 					}
 				}
 				System.out.println();
-
+				/*
+				 * if(checkAverage.isSelected())
+				 * lineChart.getData().add(average);
+				 */
 			}
 		});
 		System.out.println("-- Mostrando Calificador");
@@ -331,7 +441,6 @@ public class MainController implements Initializable {
 
 		// Mostramos Host actual en la parte inferior de la ventana
 		lblActualHost.setText("Host: " + UBUGrades.host);
-
 	}
 
 	/**
@@ -407,8 +516,8 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para filtra los participantes según el rol y el grupo
-	 * seleccionado en los MenuButtons.
+	 * Función para filtrar los participantes según el rol y el grupo
+	 * seleccionados en los MenuButtons.
 	 */
 	public void filterParticipants() {
 		try {
@@ -476,14 +585,13 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función que rellena recursivamente el árbol de
-	 * GradeReportConfigurationLines
+	 * Función que rellena recursivamente el árbol de actividades
+	 * (GradeReportConfigurationLines)
 	 * 
 	 * @param parent
 	 * @param line
 	 */
 	public void setTreeview(TreeItem<GradeReportLine> parent, GradeReportLine line) {
-
 		/*
 		 * Obtiene los hijos de la linea pasada por parametro Los transforma en
 		 * treeitems y los establece como hijos del elemento treeItem
@@ -498,10 +606,10 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Manejador de eventos para el botón de filtro por grupos. Devuelve un
-	 * manejador de eventos para cada item.
+	 * Manejador de eventos para las actividades. Devuelve un manejador de
+	 * eventos para cada item.
 	 * 
-	 * @return manejador de eventos para el botón de filtro por grupos
+	 * @return manejador de eventos para las actividades
 	 */
 	private EventHandler<ActionEvent> selectNameActivity() {
 		return new EventHandler<ActionEvent>() {
@@ -524,9 +632,9 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Manejador de eventos para el textField de filtro de calificaciones.
+	 * Manejador de eventos para el textField de filtro de actividades.
 	 * 
-	 * @return manejador de eventos para el patrón de filtro de calificaciones
+	 * @return manejador de eventos para el patrón de filtro de actividades
 	 */
 	public EventHandler<ActionEvent> inputCalification() {
 		return new EventHandler<ActionEvent>() {
@@ -545,7 +653,7 @@ public class MainController implements Initializable {
 
 	/**
 	 * Función que filtra la lista de actividades del calificador según el tipo
-	 * y el patrón introducido.
+	 * y el patrón introducidos.
 	 */
 	public void filterCalifications() {
 		try {
@@ -631,8 +739,70 @@ public class MainController implements Initializable {
 
 	}
 
-	public void showGraphics() {
+	/**
+	 * Función para cambiar de asignatura.
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void changeCourse(ActionEvent actionEvent) throws Exception {
+		System.out.println("Cambiando de asignatura...");
+		// Accedemos a la siguiente ventana
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
+		// UBUGrades.stage.getScene() setCursor(Cursor.WAIT);
+		UBUGrades.stage.close();
+		System.out.println("Accediendo a UBUGrades...");
+		UBUGrades.stage = new Stage();
+		Parent root = loader.load();
+		// root.setCursor(Cursor.WAIT);
+		Scene scene = new Scene(root);
+		UBUGrades.stage.setScene(scene);
+		UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+		UBUGrades.stage.setTitle("UBUGrades");
+		UBUGrades.stage.show();
+	}
 
+	/**
+	 * Función para el botón de exportar gráfico. El usuario podrá elegir entre
+	 * el formato .png o .jpg para guardar la imagen.
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void saveChart(ActionEvent actionEvent) throws Exception {
+		WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
+
+		// TODO: probably use a file chooser here
+		File file = new File("chart.png");
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Guardar gráfico");
+		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Images", "*.*"),
+				new FileChooser.ExtensionFilter("*.jpg", "*.jpg"), new FileChooser.ExtensionFilter("*.png", "*.png"));
+		try {
+			file = fileChooser.showSaveDialog(UBUGrades.stage);
+			if (file != null) {
+				try {
+					ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+				} catch (IOException ex) {
+					System.out.println(ex.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			// TODO: handle exception here
+		}
+	}
+
+	/**
+	 * Función para el botón de la barra de herramientas "Acerca de UBUGrades".
+	 * Abre en el navegador el repositorio del proyecto.
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void aboutUBUGrades(ActionEvent actionEvent) throws Exception {
+		Desktop.getDesktop().browse(new URL("https://github.com/claumartinezh/TFG_UBUGrades").toURI());
 	}
 
 	/**
@@ -641,7 +811,7 @@ public class MainController implements Initializable {
 	 * @param actionEvent
 	 * @throws Exception
 	 */
-	public void CloseApplication(ActionEvent actionEvent) throws Exception {
+	public void closeApplication(ActionEvent actionEvent) throws Exception {
 		System.out.println("Cerrando aplicación");
 		UBUGrades.stage.close();
 	}

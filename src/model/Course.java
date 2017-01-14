@@ -341,28 +341,33 @@ public class Course implements Serializable {
 							 * percentage); }
 							 */
 							// Sacamos el peso
-							JSONObject weightContainer = tableDataElement.getJSONObject("weight");
+							// RMS Changed
+							JSONObject weightContainer = tableDataElement.optJSONObject("weight");
 							Float weight = Float.NaN;
-							if (!weightContainer.getString("content").contains("-")) {
-								weight =getNumber(weightContainer.getString("content"));
-								// System.out.println(" - Nota item: " +
-								// weight);
-							} /*
-								 * else{
-								 * //System.out.println("   - No hay peso: " +
-								 * weight); }
-								 */
-
+							if (weightContainer != null) {
+								if (!weightContainer.getString("content").contains("-")) {
+									weight = getNumber(weightContainer.getString("content"));
+									// System.out.println(" - Nota item: " +
+									// weight);
+								} /*
+									 * else{
+									 * //System.out.println("   - No hay peso: "
+									 * + weight); }
+									 */
+							}
 							// Sacamos el rango
 							JSONObject rangeContainer = tableDataElement.getJSONObject("range");
-							Float rangeMin = getRange(rangeContainer.getString("content"), true);
-							Float rangeMax = getRange(rangeContainer.getString("content"), false);
+							// RMS changed
+							String rangeMin = getRange(rangeContainer.getString("content"), true);
+							String rangeMax = getRange(rangeContainer.getString("content"), false);
+							// System.out.println(" - Rango: " + rangeMin + "-"
+							// + rangeMax);
 							// System.out.println(" - Rango: " + rangeMin + "-"
 							// + rangeMax);
 							if (typeLine) { // Si es un item
 								// Añadimos la linea actual
-								GradeReportLine actualLine = new GradeReportLine(idLine,
-										nameLine, actualLevel, typeLine, weight, rangeMin, rangeMax, grade, percentage, typeActivity);
+								GradeReportLine actualLine = new GradeReportLine(idLine, nameLine, actualLevel,
+										typeLine, weight, rangeMin, rangeMax, grade, percentage, typeActivity);
 								if (!deque.isEmpty()) {
 									deque.lastElement().addChild(actualLine);
 								}
@@ -563,13 +568,16 @@ public class Course implements Serializable {
 	 * @param option
 	 * @return rango máximo o mínimo
 	 */
-	public float getRange(String data, boolean option) {
-		String[] ranges = data.split("&ndash;");
-		if (option) // true = rango mínimo
-			return Float.parseFloat(ranges[0]);
-		else // false = rango máximo
-			return Float.parseFloat(ranges[1]);
-	}
+	// RMS change float by String (ranges can be texts...!!!)
+		public String getRange(String data, boolean option) {
+			String[] ranges = data.split("&ndash;");
+			if (option) // true = rango mínimo
+				//return Float.parseFloat(ranges[0]);
+				return ranges[0];
+			else // false = rango máximo
+				//return Float.parseFloat(ranges[1]);
+				return ranges[1];
+		}
 
 	/**
 	 * Sustituimos el elemento de la lista que es una cabecera por el elemento
@@ -639,7 +647,7 @@ public class Course implements Serializable {
 	 * @return
 	 */
 	private Float getNumber(String data){
-		Pattern pattern = Pattern.compile("[0-9]{1,2},{1}[0-9]{1,2}");
+		Pattern pattern = Pattern.compile("[0-9]{1,3},{1}[0-9]{1,2}");
 		//Pattern pattern = Pattern.compile("[0-9]{1,2}");
 		Matcher match = pattern.matcher(data);
 		if (match.find()) {

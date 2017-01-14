@@ -74,21 +74,26 @@ public class EnrolledUser{
 					roles.add(rol);
 			}
 		}
-
-		if (obj.getJSONArray("groups") != null) {
-			JSONArray groupArray = obj.getJSONArray("groups");
-			groups = new ArrayList<Group>();
-			for (int i = 0; i < groupArray.length(); i++) {
-				// Establece un grupo con el id, name y description obtenido de
-				// cada
-				// JSONObject del JSONArray
-				Group group = new Group(groupArray.getJSONObject(i).getInt("id"),
-						groupArray.getJSONObject(i).getString("name"),
-						groupArray.getJSONObject(i).getString("description"));
-				if (group != null)
-					groups.add(group);
+		// RMS
+		if (obj.optJSONArray("groups") != null) {
+			//if (obj.getJSONArray("groups") != null) {
+				JSONArray groupArray = obj.getJSONArray("groups");
+				groups = new ArrayList<Group>();
+				for (int i = 0; i < groupArray.length(); i++) {
+					// Establece un grupo con el id, name y description obtenido de
+					// cada
+					// JSONObject del JSONArray
+					Group group = new Group(groupArray.getJSONObject(i).getInt("id"),
+							groupArray.getJSONObject(i).getString("name"),
+							groupArray.getJSONObject(i).getString("description"));
+					if (group != null)
+						groups.add(group);
+				}
 			}
-		}
+			// Added by RMS
+			else {
+				groups = new ArrayList<>(); // to have an empty list, not a null
+			}
 		this.courses = new ArrayList<Integer>();
 		// this.setCourses(token);
 	}

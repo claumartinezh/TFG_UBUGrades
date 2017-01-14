@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.Insets?>
 <?import javafx.scene.Cursor?>
 <?import javafx.scene.chart.CategoryAxis?>
 <?import javafx.scene.chart.LineChart?>
@@ -8,8 +9,10 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
-<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -20,96 +23,77 @@
 <?import javafx.scene.layout.Pane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="900.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
+<AnchorPane id="canvas" prefHeight="600.0" prefWidth="900.0" styleClass="anchorpane" stylesheets="@../config/style.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.MainController">
   <!-- TODO Add Nodes -->
   <children>
-    <Label fx:id="lblActualCourse" layoutX="270.0" layoutY="6.0" prefHeight="17.0" prefWidth="569.0" text="Asignatura actual: ">
-         <font>
-            <Font size="11.0" />
-         </font></Label>
-    <Label fx:id="lblActualUser" layoutX="270.0" layoutY="28.0" prefHeight="17.0" prefWidth="569.0" text="Usuario: ">
-         <font>
-            <Font size="11.0" />
-         </font></Label>
-    <Button fx:id="btnExit" layoutX="847.0" layoutY="11.0" mnemonicParsing="false" onAction="#CloseApplication" text="Salir">
-         <cursor>
-            <Cursor fx:constant="HAND" />
-         </cursor></Button>
-    <Pane fx:id="PanelParticipantes" layoutX="1.0" layoutY="6.0" prefHeight="280.0" prefWidth="257.0">
+    <Pane fx:id="PanelParticipantes" prefHeight="284.0" prefWidth="256.0" styleClass="pane" stylesheets="@../config/style.css">
       <children>
-        <Label fx:id="lblCountParticipants" layoutX="7.0" text="Participantes: ">
-               <font>
-                  <Font size="11.0" />
-               </font></Label>
-        <TextField fx:id="tfdParticipants" layoutX="7.0" layoutY="20.0" prefWidth="108.0" text="Filtro..." />
-        <MenuButton fx:id="slcGroup" layoutX="157.0" layoutY="2.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Grupo">
-               <font>
-                  <Font size="10.0" />
-               </font>
-        </MenuButton>
-        <Label layoutX="14.0" layoutY="47.0" prefHeight="17.0" prefWidth="108.0" text="Nombre y Apellidos">
-               <font>
-                  <Font size="11.0" />
-               </font></Label>
-        <TreeView layoutX="1.0" layoutY="74.0" prefHeight="206.0" prefWidth="257.0" />
-        <Pane fx:id="PanelCateg" layoutX="1.0" layoutY="282.0" prefHeight="314.0" prefWidth="260.0">
+        <Label fx:id="lblCountParticipants" layoutX="7.0" layoutY="5.0" text="Participantes: " />
+        <TextField fx:id="tfdParticipants" layoutX="7.0" layoutY="28.0" prefWidth="108.0" text="Filtro..." />
+        <MenuButton fx:id="slcGroup" layoutX="157.0" layoutY="1.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Grupo" />
+        <TreeView layoutY="72.0" prefHeight="206.0" prefWidth="256.0" />
+        <Pane fx:id="PanelCateg" layoutY="282.0" prefHeight="314.0" prefWidth="256.0" styleClass="pane" stylesheets="@../config/style.css">
           <children>
-            <Label layoutX="7.0" layoutY="6.0" text="Categorías / Items">
+            <Label layoutX="7.0" layoutY="2.0" text="Categorías / Items" />
+            <TextField fx:id="tfdItems" layoutX="7.0" layoutY="20.0" prefHeight="25.0" prefWidth="108.0" text="Filtro..." />
+                  <TreeView fx:id="tvwGradeReport" layoutX="-1.0" layoutY="47.0" prefHeight="271.0" prefWidth="257.0" styleClass="list-view-main" stylesheets="@../config/style.css" />
+                  <MenuButton fx:id="slcType" layoutX="157.0" layoutY="18.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Tipo" />
+                  <Label alignment="CENTER_RIGHT" layoutX="120.0" layoutY="25.0" prefHeight="16.0" prefWidth="33.0" text="Tipo:">
                      <font>
                         <Font size="11.0" />
-                     </font></Label>
-            <TextField fx:id="tfdItems" layoutX="7.0" layoutY="20.0" prefHeight="25.0" prefWidth="124.0" text="Filtro..." />
-            <Separator layoutX="2.0" layoutY="0.0" prefWidth="257.0" />
-                  <TreeView fx:id="tvwGradeReport" layoutX="2.0" layoutY="47.0" prefHeight="266.0" prefWidth="257.0" />
-                  <MenuButton fx:id="slcType" layoutX="158.0" layoutY="20.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="88.0" text="Tipo">
-                     <font>
-                        <Font size="10.0" />
                      </font>
-                  </MenuButton>
+                  </Label>
           </children>
         </Pane>
-            <ListView fx:id="listParticipants" layoutX="1.0" layoutY="65.0" prefHeight="218.0" prefWidth="257.0" />
-            <MenuButton fx:id="slcRole" layoutX="157.0" layoutY="30.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Rol">
+            <ListView fx:id="listParticipants" layoutX="-1.0" layoutY="55.0" prefHeight="228.0" prefWidth="257.0" styleClass="list-view-main" stylesheets="@../config/style.css" />
+            <MenuButton fx:id="slcRole" layoutX="157.0" layoutY="26.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="96.0" text="Rol" />
+            <Label alignment="CENTER_RIGHT" layoutX="120.0" layoutY="6.0" text="Grupo:">
                <font>
-                  <Font size="10.0" />
-               </font>
-            </MenuButton>
-            <Label layoutX="123.0" layoutY="8.0" text="Grupo:">
-               <font>
-                  <Font size="9.0" />
+                  <Font size="11.0" />
                </font>
             </Label>
-            <Label alignment="CENTER_RIGHT" layoutX="130.0" layoutY="36.0" prefHeight="13.0" prefWidth="20.0" text="Rol:" textAlignment="RIGHT" wrapText="true">
+            <Label alignment="CENTER_RIGHT" layoutX="120.0" layoutY="34.0" prefHeight="16.0" prefWidth="33.0" text="Rol:" textAlignment="RIGHT" wrapText="true">
                <font>
-                  <Font size="9.0" />
+                  <Font size="11.0" />
                </font>
             </Label>
       </children>
     </Pane>
-    <Separator layoutX="257.0" layoutY="-10.0" orientation="VERTICAL" prefHeight="610.0" prefWidth="7.0" />
-    <TabPane layoutX="261.0" layoutY="53.0" prefHeight="547.0" prefWidth="639.0" tabClosingPolicy="UNAVAILABLE">
+    <TabPane layoutX="256.0" layoutY="41.0" prefHeight="559.0" prefWidth="644.0" style="-: #ffa1a7;" tabClosingPolicy="UNAVAILABLE">
       <tabs>
         <Tab text="Gráficos">
           <content>
-            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+            <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="534.0" prefWidth="644.0">
               <children>
-                <LineChart id="LineChart" layoutX="14.0" layoutY="32.0" prefHeight="367.0" prefWidth="597.0">
+                <LineChart id="LineChart" fx:id="lineChart" layoutX="7.0" layoutY="25.0" prefHeight="374.0" prefWidth="625.0">
                   <xAxis>
-                    <CategoryAxis side="BOTTOM" />
+                    <CategoryAxis side="BOTTOM" fx:id="xAxis">
+                                 <tickLabelFont>
+                                    <Font size="11.0" />
+                                 </tickLabelFont></CategoryAxis>
                   </xAxis>
                   <yAxis>
-                    <NumberAxis autoRanging="true" side="LEFT" upperBound="10.0" />
+                    <NumberAxis fx:id="yAxis" side="LEFT" tickUnit="1.0" upperBound="10.0">
+                                 <tickLabelFont>
+                                    <Font size="12.0" />
+                                 </tickLabelFont></NumberAxis>
                   </yAxis>
+                           <padding>
+                              <Insets bottom="-2.0" left="-5.0" top="-2.0" />
+                           </padding>
                 </LineChart>
-                <Button layoutX="505.0" layoutY="414.0" mnemonicParsing="false" text="Exportar gráfico" />
-                <CheckBox layoutX="288.0" layoutY="409.0" mnemonicParsing="false" text="Agregar" />
-                <CheckBox layoutX="225.0" layoutY="409.0" mnemonicParsing="false" text="Media" />
-                      <Label fx:id="lblActualHost" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="449.0" layoutY="488.0" prefHeight="16.0" prefWidth="176.0" text="Host actual: ">
-                           <font>
-                              <Font size="11.0" />
-                           </font>
-                        </Label>
-                        <Button fx:id="btnShowGraphic" layoutX="28.0" layoutY="402.0" mnemonicParsing="false" text="Mostrar gráfico" />
+                <Button fx:id="btnExport" alignment="CENTER_RIGHT" layoutX="526.0" layoutY="425.0" mnemonicParsing="false" onAction="#saveChart" stylesheets="@../config/style.css" text="Exportar gráfico">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor></Button>
+                <CheckBox fx:id="checkAverage" contentDisplay="RIGHT" layoutX="14.0" layoutY="467.0" mnemonicParsing="false" text="Media de la clase" />
+                      <Label fx:id="lblActualHost" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="325.0" layoutY="496.0" prefHeight="17.0" prefWidth="310.0" text="Host actual: " />
+                      <Label fx:id="lblActualUser" layoutX="14.0" layoutY="496.0" prefHeight="17.0" prefWidth="310.0" text="Usuario: " />
+                      <Button fx:id="btnExit" alignment="CENTER_RIGHT" layoutX="592.0" layoutY="457.0" mnemonicParsing="false" onAction="#closeApplication" styleClass="rich-blue" stylesheets="@../config/style.css" text="Salir">
+                           <cursor>
+                              <Cursor fx:constant="HAND" />
+                           </cursor>
+                        </Button>
               </children>
             </AnchorPane>
           </content>
@@ -118,9 +102,7 @@
           <content>
             <AnchorPane id="Content" minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
               <children>
-                <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" text="Alumno" />
-                <Button layoutX="87.0" layoutY="14.0" mnemonicParsing="false" text="Tabla" />
-                <TableView layoutX="14.0" layoutY="49.0" prefHeight="429.0" prefWidth="611.0">
+                <TableView layoutX="14.0" layoutY="20.0" prefHeight="458.0" prefWidth="611.0">
                   <columns>
                     <TableColumn prefWidth="75.0" text="Categoría / Item" />
                   </columns>
@@ -131,5 +113,30 @@
         </Tab>
       </tabs>
     </TabPane>
+      <MenuBar layoutX="256.0" layoutY="1.0" prefHeight="40.0" prefWidth="644.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="Archivo">
+            <items>
+              <MenuItem fx:id="MIChangeCourse" mnemonicParsing="false" onAction="#changeCourse" text="Cambiar asignatura" />
+                  <MenuItem fx:id="MISaveChart" mnemonicParsing="false" onAction="#saveChart" text="Guardar gráfico como..." />
+                  <MenuItem fx:id="MIExit" mnemonicParsing="false" onAction="#closeApplication" text="Salir" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Editar">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Ayuda">
+            <items>
+              <MenuItem fx:id="MIAboutUBUGrades" mnemonicParsing="false" onAction="#aboutUBUGrades" text="Acerca de UBUGrades" />
+            </items>
+          </Menu>
+        </menus>
+         <padding>
+            <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+         </padding>
+      </MenuBar>
+    <Label fx:id="lblActualCourse" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="587.0" layoutY="10.0" prefHeight="20.0" prefWidth="304.0" text="Curso actual: " />
   </children>
 </AnchorPane>

@@ -40,12 +40,13 @@ public class WelcomeController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			UBUGrades.user = new MoodleUser(UBUGrades.session.getToken(), UBUGrades.session.getEmail());
-			lblUser.setText(UBUGrades.user.getFullName());
-			ArrayList<Course> courses = (ArrayList<Course>) UBUGrades.user.getCourses();
+			//UBUGrades.user = new MoodleUser(UBUGrades.session.getToken(), UBUGrades.session.getEmail());
+			lblUser.setText(UBUGrades.user.getFullName()); //He quitado esta variable:
+			System.out.println("RMS: Cargando cursos");
+			//ArrayList<Course> courses = (ArrayList<Course>) UBUGrades.user.getCourses();
 			ArrayList<String> nameCourses = new ArrayList<String>();
-			for (int i = 0; i < courses.size(); i++) {
-				nameCourses.add(courses.get(i).getFullName());
+			for (int i = 0; i < UBUGrades.user.getCourses().size(); i++) {
+				nameCourses.add(UBUGrades.user.getCourses().get(i).getFullName());
 			}
 			list = FXCollections.observableArrayList(nameCourses);
 			System.out.println("-- Mostrando Cursos");
@@ -54,16 +55,6 @@ public class WelcomeController implements Initializable {
 			e.printStackTrace();
 		}
 		listCourses.setItems(list);
-		/*
-		 * listCourses.getSelectionModel().selectedItemProperty().addListener(
-		 * new ChangeListener<String>() {
-		 * 
-		 * @Override public void changed(ObservableValue<? extends String>
-		 * observable, String oldValue, String newValue) { // Your action here
-		 * System.out.println("Selected item: " + newValue); =newValue;
-		 * 
-		 * } });
-		 */
 	}
 
 	/**

@@ -10,8 +10,8 @@ public class GradeReportLine {
 	private float grade;
 	private float percentage;
 	private float weight;
-	private float rangeMin;
-	private float rangeMax;
+	private String rangeMin;
+	private String rangeMax;
 	private boolean type; // False = Category, True = Item
 	private String nameType;
 	private ArrayList<GradeReportLine> children;
@@ -45,7 +45,8 @@ public class GradeReportLine {
 	 * @param rangeMin
 	 * @param rangeMax
 	 */
-	public GradeReportLine(int id, String name, int level, boolean type, float weight, float rangeMin, float rangeMax,
+	// RMS changed types float to String in ranges
+	public GradeReportLine(int id, String name, int level, boolean type, float weight, String rangeMin, String rangeMax,
 			float grade, float percentage, String nameType) {
 		this.id = id;
 		this.name = name;
@@ -80,14 +81,18 @@ public class GradeReportLine {
 		this.weight = weight;
 	}
 
-	public void setRangeMax(float rangeMax) {
+	// RMS changed
+	public void setRangeMax(String rangeMax) {
+		// public void setRangeMax(float rangeMax) {
 		this.rangeMax = rangeMax;
 	}
 
-	public void setRangeMin(float rangeMin) {
+	// RMS changed
+	public void setRangeMin(String rangeMin) {
+		// public void setRangeMin(float rangeMin) {
 		this.rangeMin = rangeMin;
 	}
-	
+
 	public void setPercentage(float percentage) {
 		this.percentage = percentage;
 	}
@@ -116,11 +121,15 @@ public class GradeReportLine {
 		return this.weight;
 	}
 
-	public float getRangeMax() {
+	// RMS changed
+	public String getRangeMax() {
+		// public float getRangeMax() {
 		return this.rangeMax;
 	}
 
-	public float getRangeMin() {
+	// RMS changed
+	public String getRangeMin() {
+		// public float getRangeMin() {
 		return this.rangeMin;
 	}
 
@@ -131,11 +140,11 @@ public class GradeReportLine {
 	public String getNameType() {
 		return this.nameType;
 	}
-	
+
 	public float getPercentage() {
 		return percentage;
 	}
-	
+
 	public float getGrade() {
 		return grade;
 	}
@@ -147,7 +156,8 @@ public class GradeReportLine {
 	public ArrayList<GradeReportLine> getChildren() {
 		return this.children;
 	}
-	public String toString(){
+
+	public String toString() {
 		return this.getName();
 	}
 }

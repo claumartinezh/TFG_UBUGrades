@@ -4,7 +4,6 @@ package controllers;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -57,6 +56,8 @@ public class LoginController {
 			UBUGrades.stage.close();
 			System.out.println("Accediendo a UBUGrades...");
 			UBUGrades.stage = new Stage();
+			// TODO esta línea no estaba antes
+			UBUGrades.user = new MoodleUser(UBUGrades.session.getToken(), UBUGrades.session.getEmail());
 			Parent root = loader.load();
 			//root.setCursor(Cursor.WAIT);
 			Scene scene = new Scene(root);
@@ -64,7 +65,7 @@ public class LoginController {
 			UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
 			UBUGrades.stage.setTitle("UBUGrades");
 			UBUGrades.stage.show();
-			lblStatus.setText("");			
+			lblStatus.setText("");		
 		} else {
 			lblStatus.setText(" Usuario incorrecto");
 			System.out.println("Login Incorrecto");

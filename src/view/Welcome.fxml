@@ -4,28 +4,43 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WelcomeController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="anchorpane" stylesheets="@../config/style.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WelcomeController">
 	<children>
-		<Label layoutX="112.0" layoutY="87.0" text="Bienvenida/o,">
+      <ImageView fitHeight="68.0" fitWidth="350.0" layoutX="303.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/titulo.png" />
+         </image>
+      </ImageView>
+      <ImageView fitHeight="161.0" fitWidth="161.0" layoutX="125.0" layoutY="49.0" pickOnBounds="true" preserveRatio="true">
+         <image>
+            <Image url="@../img/logo_min.png" />
+         </image>
+      </ImageView>
+		<Label layoutX="301.0" layoutY="143.0" text="Bienvenida/o,">
 			<font>
 				<Font size="22.0" />
 			</font>
 		</Label>
-		<Label fx:id="lblUser" layoutX="253.0" layoutY="84.0" text="Nombre de usuario">
+		<Label fx:id="lblUser" layoutX="442.0" layoutY="140.0" text="Nombre de usuario">
 			<font>
 				<Font size="27.0" />
 			</font>
 		</Label>
-		<ListView fx:id="listCourses" layoutX="148.0" layoutY="175.0" prefHeight="265.0" prefWidth="504.0" />
-		<Label layoutX="143.0" layoutY="138.0" text="Por favor, seleccione un curso:">
+		<ListView fx:id="listCourses" layoutX="139.0" layoutY="219.0" prefHeight="265.0" prefWidth="540.0" styleClass="list-view-intro" stylesheets="@../config/style.css">
+         <cursor>
+            <Cursor fx:constant="DEFAULT" />
+         </cursor></ListView>
+		<Label layoutX="303.0" layoutY="179.0" text="Por favor, seleccione un curso:">
 			<font>
 				<Font size="15.0" />
 			</font>
 		</Label>
-		<Button fx:id="btnEntrar" layoutX="352.0" layoutY="467.0" mnemonicParsing="false" onAction="#EnterCourse" prefHeight="39.0" prefWidth="86.0" text="Entrar">
+		<Button fx:id="btnEntrar" layoutX="366.0" layoutY="502.0" mnemonicParsing="false" onAction="#EnterCourse" prefHeight="39.0" prefWidth="86.0" styleClass="rich-blue" stylesheets="@../config/style.css" text="Entrar">
 			<font>
 				<Font size="19.0" />
 			</font>
@@ -33,7 +48,7 @@
 				<Cursor fx:constant="HAND" />
 			</cursor>
 		</Button>
-      <Label fx:id="lblNoSelect" layoutX="308.0" layoutY="520.0" prefWidth="175.0" textFill="#e11010">
+      <Label fx:id="lblNoSelect" layoutX="322.0" layoutY="552.0" prefWidth="175.0" style="-fx-text-fill: #ff5050;" textFill="#e11010">
          <font>
             <Font size="15.0" />
          </font>

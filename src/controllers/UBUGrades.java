@@ -28,7 +28,7 @@ public class UBUGrades extends Application {
 			loader.setLocation(getClass().getResource("./../view/Login.fxml"));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			//scene.getStylesheets().add(UBUGrades.class.getResource("/config/style.css").toExternalForm());
 			stage = primaryStage;
 
 			stage.setScene(scene);
@@ -41,6 +41,9 @@ public class UBUGrades extends Application {
 	}
 
 	// Main comando
+	public static void main(String[] args){
+		launch(args);
+	}
 
 	/*
 	 * public static void main(String[] args) throws Exception { String email =
