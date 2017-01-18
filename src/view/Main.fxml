@@ -13,6 +13,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuButton?>
 <?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -59,7 +60,7 @@
             </Label>
       </children>
     </Pane>
-    <TabPane layoutX="256.0" layoutY="41.0" prefHeight="559.0" prefWidth="644.0" style="-: #ffa1a7;" tabClosingPolicy="UNAVAILABLE">
+    <TabPane layoutX="256.0" layoutY="59.0" prefHeight="541.0" prefWidth="644.0" style="-: #ffa1a7;" tabClosingPolicy="UNAVAILABLE">
       <tabs>
         <Tab text="Gráficos">
           <content>
@@ -73,7 +74,7 @@
                                  </tickLabelFont></CategoryAxis>
                   </xAxis>
                   <yAxis>
-                    <NumberAxis fx:id="yAxis" side="LEFT" tickUnit="1.0" upperBound="10.0">
+                    <NumberAxis fx:id="yAxis" autoRanging="false" side="LEFT" tickUnit="1.0" upperBound="10.0">
                                  <tickLabelFont>
                                     <Font size="12.0" />
                                  </tickLabelFont></NumberAxis>
@@ -82,14 +83,12 @@
                               <Insets bottom="-2.0" left="-5.0" top="-2.0" />
                            </padding>
                 </LineChart>
-                <Button fx:id="btnExport" alignment="CENTER_RIGHT" layoutX="526.0" layoutY="425.0" mnemonicParsing="false" onAction="#saveChart" stylesheets="@../config/style.css" text="Exportar gráfico">
+                <Button fx:id="btnExport" alignment="CENTER_RIGHT" layoutX="14.0" layoutY="472.0" mnemonicParsing="false" onAction="#saveChart" style="-fx-font-size: 13;" stylesheets="@../config/style.css" text="Exportar gráfico">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor></Button>
-                <CheckBox fx:id="checkAverage" contentDisplay="RIGHT" layoutX="14.0" layoutY="467.0" mnemonicParsing="false" text="Media de la clase" />
-                      <Label fx:id="lblActualHost" alignment="BOTTOM_RIGHT" contentDisplay="RIGHT" layoutX="325.0" layoutY="496.0" prefHeight="17.0" prefWidth="310.0" text="Host actual: " />
-                      <Label fx:id="lblActualUser" layoutX="14.0" layoutY="496.0" prefHeight="17.0" prefWidth="310.0" text="Usuario: " />
-                      <Button fx:id="btnExit" alignment="CENTER_RIGHT" layoutX="592.0" layoutY="457.0" mnemonicParsing="false" onAction="#closeApplication" styleClass="rich-blue" stylesheets="@../config/style.css" text="Salir">
+                <CheckBox fx:id="checkAverage" contentDisplay="RIGHT" layoutX="14.0" layoutY="445.0" mnemonicParsing="false" text="Media de la clase" />
+                      <Button fx:id="btnExit" alignment="CENTER_RIGHT" layoutX="591.0" layoutY="472.0" mnemonicParsing="false" onAction="#closeApplication" style="-fx-font-size: 13;" styleClass="rich-blue" stylesheets="@../config/style.css" text="Salir">
                            <cursor>
                               <Cursor fx:constant="HAND" />
                            </cursor>
@@ -113,7 +112,7 @@
         </Tab>
       </tabs>
     </TabPane>
-      <MenuBar layoutX="256.0" layoutY="1.0" prefHeight="40.0" prefWidth="644.0">
+      <MenuBar layoutX="256.0" layoutY="1.0" prefHeight="59.0" prefWidth="644.0">
         <menus>
           <Menu mnemonicParsing="false" text="Archivo">
             <items>
@@ -137,6 +136,9 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </padding>
       </MenuBar>
-    <Label fx:id="lblActualCourse" alignment="CENTER_RIGHT" contentDisplay="CENTER" layoutX="587.0" layoutY="10.0" prefHeight="20.0" prefWidth="304.0" text="Curso actual: " />
+    <Label fx:id="lblActualCourse" contentDisplay="CENTER" layoutX="580.0" layoutY="20.0" prefHeight="20.0" prefWidth="320.0" styleClass="label-info" stylesheets="@../config/style.css" text="Curso actual: " />
+    <Label fx:id="lblActualUser" layoutX="580.0" prefHeight="24.0" prefWidth="320.0" styleClass="label-info" stylesheets="@../config/style.css" text="Usuario: " />
+    <Label fx:id="lblActualHost" contentDisplay="RIGHT" layoutX="580.0" layoutY="38.0" prefHeight="21.0" prefWidth="320.0" styleClass="label-info" stylesheets="@../config/style.css" text="Host actual: " />
+      <Separator layoutX="580.0" orientation="VERTICAL" prefHeight="59.0" prefWidth="4.0" />
   </children>
 </AnchorPane>

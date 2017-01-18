@@ -10,9 +10,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import model.*;
+import webservice.*;
 
 /**
- * Clase para controlar la ventana de Login
+ * Clase controlador de la ventana de Login
  * 
  * @author Claudia Martínez Herrero
  *
@@ -30,8 +31,8 @@ public class LoginController {
 	private Button btnLogin;
 
 	/**
-	 * Función para hacer el login de usuario con el botón Entrar. Si el usuario
-	 * es incorrecto, muestra un mensaje de error.
+	 * Hace el login de usuario al pulsar el botón Entrar. Si el usuario es
+	 * incorrecto, muestra un mensaje de error.
 	 * 
 	 * @param event
 	 * @throws Exception
@@ -52,20 +53,22 @@ public class LoginController {
 			// Accedemos a la siguiente ventana
 			FXMLLoader loader = new FXMLLoader();
 			loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
-			//UBUGrades.stage.getScene() setCursor(Cursor.WAIT);
+			// UBUGrades.stage.getScene() setCursor(Cursor.WAIT);
 			UBUGrades.stage.close();
 			System.out.println("Accediendo a UBUGrades...");
 			UBUGrades.stage = new Stage();
 			// TODO esta línea no estaba antes
-			UBUGrades.user = new MoodleUser(UBUGrades.session.getToken(), UBUGrades.session.getEmail());
+			MoodleUserWS.setMoodleUser(UBUGrades.session.getToken(), UBUGrades.session.getEmail(),
+					UBUGrades.user = new MoodleUser());
+			MoodleUserWS.setCourses(UBUGrades.session.getToken(), UBUGrades.user);
 			Parent root = loader.load();
-			//root.setCursor(Cursor.WAIT);
+			// root.setCursor(Cursor.WAIT);
 			Scene scene = new Scene(root);
 			UBUGrades.stage.setScene(scene);
 			UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
 			UBUGrades.stage.setTitle("UBUGrades");
 			UBUGrades.stage.show();
-			lblStatus.setText("");		
+			lblStatus.setText("");
 		} else {
 			lblStatus.setText(" Usuario incorrecto");
 			System.out.println("Login Incorrecto");
@@ -75,7 +78,7 @@ public class LoginController {
 	}
 
 	/**
-	 * Función para borrar los parámetros introducidos
+	 * Borra los parámetros introducidos de los campos
 	 * 
 	 * @param event
 	 * @throws Exception
@@ -83,5 +86,6 @@ public class LoginController {
 	public void Clear(ActionEvent event) throws Exception {
 		txtUsername.setText("");
 		txtPassword.setText("");
+		txtHost.setText("");
 	}
 }

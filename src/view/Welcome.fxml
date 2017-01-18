@@ -11,7 +11,7 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="anchorpane" stylesheets="@../config/style.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WelcomeController">
 	<children>
-      <ImageView fitHeight="68.0" fitWidth="350.0" layoutX="303.0" layoutY="62.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="68.0" fitWidth="350.0" layoutX="303.0" layoutY="75.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../img/titulo.png" />
          </image>
@@ -40,7 +40,7 @@
 				<Font size="15.0" />
 			</font>
 		</Label>
-		<Button fx:id="btnEntrar" layoutX="366.0" layoutY="502.0" mnemonicParsing="false" onAction="#EnterCourse" prefHeight="39.0" prefWidth="86.0" styleClass="rich-blue" stylesheets="@../config/style.css" text="Entrar">
+		<Button fx:id="btnEntrar" layoutX="366.0" layoutY="502.0" mnemonicParsing="false" onAction="#EnterCourse" prefHeight="39.0" prefWidth="86.0" style="-fx-font-size: 16;" styleClass="rich-blue" stylesheets="@../config/style.css" text="Entrar">
 			<font>
 				<Font size="19.0" />
 			</font>

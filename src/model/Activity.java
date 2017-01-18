@@ -15,56 +15,145 @@ public class Activity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String itemName;
 	private String activityType;
-	private String level;
-	private int weight;
-	private int grade;
-	private int minRange;
-	private int maxRange;
-	private int percentage;
-	private String feedback;
-	private int contributionCourseTotal;
+	// private String level;
+	private float weight;
+	private String minRange;
+	private String maxRange;
+	// private float percentage;
+	private float contributionCourseTotal;
 
 	public Activity(String token, JSONObject obj) throws Exception {
 		// TODO
 	}
 
+	/**
+	 * Constructor de una actividad con todos sus parámetros
+	 * 
+	 * @param itemName
+	 *            nombre de la actividad
+	 * @param type
+	 *            tipo de actividad
+	 * @param weight
+	 *            peso
+	 * @param minRange
+	 *            rango mínimo de nota
+	 * @param maxRange
+	 *            rango máximo de nota
+	 */
+	public Activity(String itemName, String type, float weight, String minRange, String maxRange) {
+		this.itemName = itemName;
+		this.activityType = type;
+		this.weight = weight;
+		this.minRange = minRange;
+		this.maxRange = maxRange;
+	}
+
+	/**
+	 * Devuelve el nombre de la actividad
+	 * 
+	 * @return nombre de la actividad
+	 */
 	public String getItemName() {
-		return this.itemName;
+		return itemName;
 	}
 
+	/**
+	 * Modifica el nombre de la actividad
+	 * 
+	 * @param itemName
+	 */
+	public void setItemName(String itemName) {
+		this.itemName = itemName;
+	}
+
+	/**
+	 * Devuelve el tipo de la actividad
+	 * 
+	 * @return tipo de actividad
+	 */
 	public String getActivityType() {
-		return this.activityType;
+		return activityType;
 	}
 
-	public String getLevel() {
-		return this.level;
+	/**
+	 * Modifica el tipo de la actividad
+	 * 
+	 * @param activityType
+	 */
+	public void setActivityType(String activityType) {
+		this.activityType = activityType;
 	}
 
-	public int getWeight() {
-		return this.weight;
+	/**
+	 * Devuelve el peso de la actividad
+	 * 
+	 * @return peso
+	 */
+	public float getWeight() {
+		return weight;
 	}
 
-	public int getGrade() {
-		return this.grade;
+	/**
+	 * Modifica el peso de la actividad
+	 * 
+	 * @param weight
+	 */
+	public void setWeight(float weight) {
+		this.weight = weight;
 	}
 
-	public int getMinRange() {
-		return this.minRange;
+	/**
+	 * Devuelve el rango mínimo
+	 * 
+	 * @return minRange
+	 */
+	public String getMinRange() {
+		return minRange;
 	}
 
-	public int getMaxRange() {
-		return this.maxRange;
+	/**
+	 * Modifica el rango mínimo
+	 * 
+	 * @param minRange
+	 */
+	public void setMinRange(String minRange) {
+		this.minRange = minRange;
 	}
 
-	public int getPercentage() {
-		return this.percentage;
+	/**
+	 * Devuelve el rango máximo
+	 * 
+	 * @return maxRange
+	 */
+	public String getMaxRange() {
+		return maxRange;
 	}
 
-	public String getFeedback() {
-		return this.feedback;
+	/**
+	 * Modifica el rango máximo
+	 * 
+	 * @param maxRange
+	 */
+	public void setMaxRange(String maxRange) {
+		this.maxRange = maxRange;
 	}
 
-	public int getContributionCourseTotal() {
-		return this.contributionCourseTotal;
+	/**
+	 * Devuelve la contribución total de la actividad
+	 * 
+	 * @return contributionCourseTotal
+	 */
+	public float getContributionCourseTotal() {
+		return contributionCourseTotal;
 	}
+
+	/**
+	 * Modifica contrila bución total de la actividad
+	 * 
+	 * @param contributionCourseTotal
+	 */
+	public void setContributionCourseTotal(float contributionCourseTotal) {
+		this.contributionCourseTotal = contributionCourseTotal;
+	}
+
 }

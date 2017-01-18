@@ -1,4 +1,4 @@
-package model;
+package webservice;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -8,6 +8,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONObject;
 
 import controllers.UBUGrades;
+import model.Course;
+import model.MoodleOptions;
 
 /**
  * Clase sesión. Obtiene el token de usuario y guarda sus parámetros
@@ -21,14 +23,31 @@ public class Session {
 	private String tokenUser;
 	private Course actualCourse;
 
+	/**
+	 * Constructor de la clase Session
+	 * 
+	 * @param mail
+	 *            correo del usuario
+	 * @param pass
+	 *            contraseña de usuario
+	 */
 	public Session(String mail, String pass) {
 		this.eMail = mail;
 		this.password = pass;
 	}
 
 	/**
-	 * Obtiene el token del usuario a partir de usuario y contraseña. Se realiza
-	 * mediante una petición http al webservice de Moodle
+	 * Obtiene el token de usuario
+	 * 
+	 * @return
+	 */
+	public String getToken() {
+		return this.tokenUser;
+	}
+
+	/**
+	 * Establece el token del usuario a partir de usuario y contraseña. Se
+	 * realiza mediante una petición http al webservice de Moodle
 	 * 
 	 * @throws Exception
 	 */
@@ -62,20 +81,39 @@ public class Session {
 		}
 	}
 
-	public String getToken() {
-		return this.tokenUser;
-	}
-
+	/**
+	 * Devuelve el email del usuario
+	 * 
+	 * @return email
+	 */
 	public String getEmail() {
 		return this.eMail;
 	}
 
-	public void setCourse(Course course) {
-		this.actualCourse = course;
+	/**
+	 * Modifica el email del usuario
+	 * 
+	 * @param email
+	 */
+	public void setEmail(String email) {
+		this.eMail = email;
 	}
 
-	public Course getCourse() {
+	/**
+	 * Devuelve el curso actual
+	 * 
+	 * @return actualCourse
+	 */
+	public Course getActualCourse() {
 		return this.actualCourse;
 	}
 
+	/**
+	 * Modifica el curso actual
+	 * 
+	 * @param course
+	 */
+	public void setActualCourse(Course course) {
+		this.actualCourse = course;
+	}
 }

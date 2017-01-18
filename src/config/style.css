@@ -3,17 +3,17 @@
 }
 
 .button{
-	-fx-background-color: #83c9ff;
-	-fx-padding: 4 6 4 6;
+	-fx-background-color: #84b3e7;
+	-fx-padding: 4.0 6.0 4.0 6.0;
 	-fx-font-size: 13.0px;
 	-fx-text-fill: black;
 	-fx-background-radius: 4.0;
-	-fx-border-radius:1;
+	-fx-border-radius:1.0;
 	-fx-border-color:#000080; 
 }
 
 .button:hover{
-	-fx-background-color: #4db2ff;
+	-fx-background-color: #96bbe4;
 	-fx-fill: #ff83c9;
 }
 
@@ -86,4 +86,22 @@
      * TODO: should this be derived from -fx-accent?
      */
     -fx-focus-color: #ffa1a7;
+}
+
+.tree-cell .tree-disclosure-node .arrow {
+    /*-fx-shape: square;
+    -fx-background-color: blue;*/
+    -fx-background-image: url("../img/arrow_collapsed.png");
+}
+.tree-cell:expanded .tree-disclosure-node .arrow {
+    /*-fx-shape: circle;
+    -fx-background-color: green;*/
+    -fx-background-image: url("../img/arrow_expanded.png");
+}
+
+.label-info{
+	-fx-font-size:11;
+	/*-fx-background-color:#ffff99;*/
+	-fx-margin:15;
+	-fx-padding:0 0 0 8 ;
 }

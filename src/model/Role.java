@@ -11,6 +11,16 @@ public class Role {
 	private String name;
 	private String shortName;
 
+	/**
+	 * Constructor de un rol.
+	 * 
+	 * @param id
+	 *            id del rol
+	 * @param name
+	 *            nombre del rol
+	 * @param shortName
+	 *            nombre corto
+	 */
 	public Role(int id, String name, String shortName) {
 		// super();
 		this.id = id;
@@ -19,48 +29,57 @@ public class Role {
 	}
 
 	/**
-	 * @return the id
+	 * Devuelve el id del rol
+	 * 
+	 * @return id
 	 */
 	public int getId() {
 		return id;
 	}
 
 	/**
+	 * Modifica el id del rol
+	 * 
 	 * @param id
-	 *            the id to set
 	 */
 	public void setId(int id) {
 		this.id = id;
 	}
 
 	/**
-	 * @return the name
+	 * Devuelve el nombre del rol
+	 * 
+	 * @return name
 	 */
 	public String getName() {
 		return name;
 	}
 
 	/**
+	 * Modifica el nombre del rol
+	 * 
 	 * @param name
-	 *            the name to set
 	 */
 	public void setName(String name) {
 		this.name = name;
 	}
 
 	/**
-	 * @return the shortName
+	 * Devuelve el nombre corto del rol
+	 * 
+	 * @return shortName
 	 */
 	public String getShortName() {
 		return shortName;
 	}
 
 	/**
+	 * Modifica el nombre corto del rol
+	 * 
 	 * @param shortName
-	 *            the shortName to set
+	 * 
 	 */
 	public void setShortName(String shortName) {
 		this.shortName = shortName;
 	}
-
 }

@@ -3,18 +3,13 @@ package controllers;
 import java.awt.Desktop;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.ResourceBundle;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
-
-import com.sun.deploy.uitoolkit.impl.fx.HostServicesFactory;
-import com.sun.javafx.application.HostServicesDelegate;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -25,6 +20,7 @@ import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
@@ -42,6 +38,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeView;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
@@ -50,9 +47,10 @@ import model.EnrolledUser;
 import model.GradeReportLine;
 import model.Group;
 import model.Role;
+import webservice.CourseWS;
 
 /**
- * Clase para controlar la ventana principal
+ * Clase para controlador de la ventana principal
  * 
  * @author Claudia Martínez Herrero
  *
@@ -116,18 +114,27 @@ public class MainController implements Initializable {
 	private XYChart.Series<String, Number> average;
 
 	/**
-	 * Función initialize. Muestra los usuarios matriculados en el curso, así
-	 * como las actividades de las que se compone.
+	 * Muestra los usuarios matriculados en el curso, así como las actividades
+	 * de las que se compone.
 	 */
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
-			// canvas.getStylesheets().add("@../config/style.css");
+			// Establecemos los elementos de los cursos
+			CourseWS.setEnrolledUsers(UBUGrades.session.getToken(), UBUGrades.session.getActualCourse());
+			;
 			// Estableciendo calificador
-			UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
-					UBUGrades.session.getCourse().getEnrolledUsers().get(0).getId());
+			CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(),
+					UBUGrades.session.getActualCourse().getEnrolledUsers().get(0).getId(),
+					UBUGrades.session.getActualCourse());
+			/*
+			 * UBUGrades.session.getCourse().setGradeReportConfigurationLines(
+			 * UBUGrades.session.getToken(),
+			 * UBUGrades.session.getCourse().getEnrolledUsers().get(0).getId());
+			 */
 			// Establecemos la lista de todos participantes
-			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
+			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getActualCourse()
+					.getEnrolledUsers();
 			// Cargamos una lista con los nombres de los participantes
 			ArrayList<EnrolledUser> nameUsers = new ArrayList<EnrolledUser>();
 
@@ -135,7 +142,7 @@ public class MainController implements Initializable {
 			// Manejo de roles (MenuButton Rol):
 			EventHandler<ActionEvent> actionRole = selectRole();
 			// Cargamos una lista con los nombres de los roles
-			ArrayList<String> rolesList = UBUGrades.session.getCourse().getRoles();
+			ArrayList<String> rolesList = UBUGrades.session.getActualCourse().getRoles();
 			// Convertimos la lista a una lista de MenuItems para el MenuButton
 			ArrayList<MenuItem> rolesItemsList = new ArrayList<MenuItem>();
 			// En principio se van a mostrar todos los participantes con
@@ -161,7 +168,7 @@ public class MainController implements Initializable {
 			// Manejo de grupos (MenuButton Grupo):
 			EventHandler<ActionEvent> actionGroup = selectGroup();
 			// Cargamos una lista de los nombres de los grupos
-			ArrayList<String> groupsList = UBUGrades.session.getCourse().getGroups();
+			ArrayList<String> groupsList = UBUGrades.session.getActualCourse().getGroups();
 			// Convertimos la lista a una lista de MenuItems para el MenuButton
 			ArrayList<MenuItem> groupsItemsList = new ArrayList<MenuItem>();
 			// En principio se van a mostrar todos los participantes en
@@ -192,7 +199,7 @@ public class MainController implements Initializable {
 			// Manejo de actividades (TreeView GRCL):
 			EventHandler<ActionEvent> actionActivity = selectNameActivity();
 			// Cargamos una lista de los nombres de los grupos
-			ArrayList<String> nameActivityList = UBUGrades.session.getCourse().getTypeActivities();
+			ArrayList<String> nameActivityList = UBUGrades.session.getActualCourse().getActivities();
 			// Convertimos la lista a una lista de MenuItems para el MenuButton
 			ArrayList<MenuItem> nameActivityItemsList = new ArrayList<MenuItem>();
 			// En principio se van a mostrar todos los participantes en
@@ -282,8 +289,13 @@ public class MainController implements Initializable {
 				for (EnrolledUser actualUser : selectedParticipants) {
 					// Establecemos el configurador del curso con este usuario
 					try {
-						UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
-								actualUser.getId());
+						CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(), actualUser.getId(),
+								UBUGrades.session.getActualCourse());
+						/*
+						 * UBUGrades.session.getCourse().
+						 * setGradeReportConfigurationLines(UBUGrades.session.
+						 * getToken(), actualUser.getId());
+						 */
 					} catch (Exception e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -297,14 +309,16 @@ public class MainController implements Initializable {
 					XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 					series.setName(actualUser.getFullName());
 					for (TreeItem<GradeReportLine> structTree : selectedGRL) {
-						for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
+						for (GradeReportLine actualLine : UBUGrades.session.getActualCourse().getGradeReportLines()) {
 							// Por cada actividad que haya seleccionada,
 							// lo buscamos en la estructura y obtenemos
 							// los valores necesarios
 							if (structTree.getValue().getId() == actualLine.getId()) {
-								float calculatedGrade = actualLine.getGrade();
-								// Al cambiar el rango a String ya no se puede hacer este cálculo
-								//float calculatedGrade = (actualLine.getGrade() / actualLine.getRangeMax()) * 10;
+								// float calculatedGrade =
+								// actualLine.getGrade();
+								// TODO No saca bien la nota de la categoría
+								float calculatedGrade = (actualLine.getGrade()
+										/ Float.valueOf(actualLine.getRangeMax())) * 10;
 								series.getData()
 										.add(new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
 								/*
@@ -340,12 +354,15 @@ public class MainController implements Initializable {
 
 		////////////////////////////////////////////////////////
 		// Mostramos la estructura en arbol del calificador
-		ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getCourse().getGRCL();
+		ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getActualCourse()
+				.getGradeReportLines();
 		// Establecemos la raiz del Treeview
 		TreeItem<GradeReportLine> root = new TreeItem<GradeReportLine>(grcl.get(0));
+		MainController.setIcon(root);
 		// Llamamos recursivamente para llenar el Treeview
 		for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
 			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
+			MainController.setIcon(item);
 			root.getChildren().add(item);
 			root.setExpanded(true);
 			setTreeview(item, grcl.get(0).getChildren().get(k));
@@ -375,8 +392,13 @@ public class MainController implements Initializable {
 					lineChart.getData().clear();
 					for (EnrolledUser actualUser : selectedParticipants) {
 						try {
-							UBUGrades.session.getCourse().setGradeReportConfigurationLines(UBUGrades.session.getToken(),
-									actualUser.getId());
+							CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(), actualUser.getId(),
+									UBUGrades.session.getActualCourse());
+							/*
+							 * UBUGrades.session.getCourse().
+							 * setGradeReportConfigurationLines(UBUGrades.
+							 * session.getToken(), actualUser.getId());
+							 */
 						} catch (Exception e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -388,11 +410,15 @@ public class MainController implements Initializable {
 						XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 						series.setName(actualUser.getFullName());
 						for (TreeItem<GradeReportLine> structTree : selectedGRL) {
-							for (GradeReportLine actualLine : UBUGrades.session.getCourse().getGRCL()) {
+							for (GradeReportLine actualLine : UBUGrades.session.getActualCourse()
+									.getGradeReportLines()) {
 								if (structTree.getValue().getId() == actualLine.getId()) {
-									float calculatedGrade = actualLine.getGrade();
-									// Al cambiar el rango a String ya no se puede hacer este cálculo
-									//float calculatedGrade = (actualLine.getGrade() / actualLine.getRangeMax()) * 10;
+									// float calculatedGrade =
+									// actualLine.getGrade();
+									// Al cambiar el rango a String ya no se
+									// puede hacer este cálculo
+									float calculatedGrade = (actualLine.getGrade()
+											/ Float.valueOf(actualLine.getRangeMax())) * 10;
 									// System.out.println(calculatedGrade);
 									series.getData().add(
 											new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
@@ -430,14 +456,14 @@ public class MainController implements Initializable {
 		// slcRole.getItems().addAll(roles);
 
 		// Mostramos nº participantes a la izquierda de la ventana
-		lblCountParticipants
-				.setText("Participantes: " + String.valueOf(UBUGrades.session.getCourse().getEnrolledUsersCount()));
-
-		// Mostramos curso actual en la parte superior de la ventana
-		lblActualCourse.setText("Curso actual: " + UBUGrades.session.getCourse().getFullName());
+		lblCountParticipants.setText(
+				"Participantes: " + String.valueOf(UBUGrades.session.getActualCourse().getEnrolledUsersCount()));
 
 		// Mostramos Usuario logeado en la parte superior de la ventana
 		lblActualUser.setText("Usuario: " + UBUGrades.user.getFullName());
+
+		// Mostramos curso actual en la parte superior de la ventana
+		lblActualCourse.setText("Curso actual: " + UBUGrades.session.getActualCourse().getFullName());
 
 		// Mostramos Host actual en la parte inferior de la ventana
 		lblActualHost.setText("Host: " + UBUGrades.host);
@@ -516,15 +542,16 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para filtrar los participantes según el rol y el grupo
-	 * seleccionados en los MenuButtons.
+	 * Filtra los participantes según el rol y el grupo seleccionados en los
+	 * MenuButtons.
 	 */
 	public void filterParticipants() {
 		try {
 			boolean roleYes;
 			boolean groupYes;
 			boolean patternYes;
-			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getCourse().getEnrolledUsers();
+			ArrayList<EnrolledUser> users = (ArrayList<EnrolledUser>) UBUGrades.session.getActualCourse()
+					.getEnrolledUsers();
 			// Cargamos la lista de los roles
 			ArrayList<EnrolledUser> nameUsers = new ArrayList<EnrolledUser>();
 			// Obtenemos los participantes que tienen el rol elegido
@@ -585,7 +612,7 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función que rellena recursivamente el árbol de actividades
+	 * Rellena recursivamente el árbol de actividades
 	 * (GradeReportConfigurationLines)
 	 * 
 	 * @param parent
@@ -599,9 +626,35 @@ public class MainController implements Initializable {
 		 */
 		for (int j = 0; j < line.getChildren().size(); j++) {
 			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(line.getChildren().get(j));
+			MainController.setIcon(item);
 			parent.getChildren().add(item);
 			parent.setExpanded(true);
-			setTreeview(item, line.getChildren().get(j));
+			;
+		}
+	}
+
+	/**
+	 * Añade un icono a cada elemento del árbol según su tipo de actividad
+	 * 
+	 * @param item
+	 */
+	public static void setIcon(TreeItem<GradeReportLine> item) {
+		// System.out.println(item.getValue().getNameType());
+		switch (item.getValue().getNameType()) {
+		case "Assignment":
+			item.setGraphic((Node) new ImageView(new Image("./img/assignment.png")));
+			break;
+		case "Quiz":
+			item.setGraphic((Node) new ImageView(new Image("./img/quiz.png")));
+			break;
+		case "ManualItem":
+			item.setGraphic((Node) new ImageView(new Image("./img/manual_item.png")));
+			break;
+		case "Category":
+			item.setGraphic((Node) new ImageView(new Image("./img/folder.png")));
+			break;
+		default:
+			break;
 		}
 	}
 
@@ -652,19 +705,22 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función que filtra la lista de actividades del calificador según el tipo
-	 * y el patrón introducidos.
+	 * Filtra la lista de actividades del calificador según el tipo y el patrón
+	 * introducidos.
 	 */
 	public void filterCalifications() {
 		try {
-			ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getCourse().getGRCL();
+			ArrayList<GradeReportLine> grcl = (ArrayList<GradeReportLine>) UBUGrades.session.getActualCourse()
+					.getGradeReportLines();
 			// Establecemos la raiz del Treeview
 			TreeItem<GradeReportLine> root = new TreeItem<GradeReportLine>(grcl.get(0));
+			MainController.setIcon(root);
 			// Llamamos recursivamente para llenar el Treeview
 			if (filterType.equals("Todos") && patternCalifications.equals("")) {
 				// Sin filtro y sin patrón
 				for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
 					TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
+					MainController.setIcon(item);
 					root.getChildren().add(item);
 					root.setExpanded(true);
 					setTreeview(item, grcl.get(0).getChildren().get(k));
@@ -672,6 +728,7 @@ public class MainController implements Initializable {
 			} else { // Con filtro
 				for (int k = 0; k < grcl.get(0).getChildren().size(); k++) {
 					TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(grcl.get(0).getChildren().get(k));
+					MainController.setIcon(item);
 					boolean activityYes = false;
 					if (grcl.get(0).getChildren().get(k).getNameType().equals(filterType)
 							|| filterType.equals("Todos")) {
@@ -702,8 +759,8 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función que crea un árbol filtrado en el que los hijos del root(raíz) son
-	 * elementos de cualquier nivel que cumplen el filtro
+	 * Crea un árbol filtrado en el que los hijos del root(raíz) son elementos
+	 * de cualquier nivel que cumplen el filtro
 	 * 
 	 * @param root
 	 * @param parent
@@ -740,7 +797,7 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para cambiar de asignatura.
+	 * Cambia la asignatura actual y carga otra
 	 * 
 	 * @param actionEvent
 	 * @throws Exception
@@ -764,8 +821,8 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para el botón de exportar gráfico. El usuario podrá elegir entre
-	 * el formato .png o .jpg para guardar la imagen.
+	 * Exporta el gráfico. El usuario podrá elegir entre el formato .png o .jpg
+	 * para guardar la imagen.
 	 * 
 	 * @param actionEvent
 	 * @throws Exception
@@ -778,7 +835,7 @@ public class MainController implements Initializable {
 
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Guardar gráfico");
-		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Images", "*.*"),
+		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"),
 				new FileChooser.ExtensionFilter("*.jpg", "*.jpg"), new FileChooser.ExtensionFilter("*.png", "*.png"));
 		try {
 			file = fileChooser.showSaveDialog(UBUGrades.stage);
@@ -795,8 +852,8 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para el botón de la barra de herramientas "Acerca de UBUGrades".
-	 * Abre en el navegador el repositorio del proyecto.
+	 * Botón de la barra de herramientas "Acerca de UBUGrades". Abre en el
+	 * navegador el repositorio del proyecto.
 	 * 
 	 * @param actionEvent
 	 * @throws Exception
@@ -806,7 +863,7 @@ public class MainController implements Initializable {
 	}
 
 	/**
-	 * Función para el botón "Salir". Cierra la aplicación.
+	 * Botón "Salir". Cierra la aplicación.
 	 * 
 	 * @param actionEvent
 	 * @throws Exception

@@ -1,7 +1,7 @@
 package model;
 
 /**
- * Clase en la que se encuentran las funciones de servicios web a utilizar.
+ * Clase que recoge las funciones de servicios web a utilizar.
  * 
  * @author Claudia Martínez Herrero
  *
