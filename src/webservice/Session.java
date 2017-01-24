@@ -9,7 +9,6 @@ import org.json.JSONObject;
 
 import controllers.UBUGrades;
 import model.Course;
-import model.MoodleOptions;
 
 /**
  * Clase sesión. Obtiene el token de usuario y guarda sus parámetros
@@ -18,7 +17,7 @@ import model.MoodleOptions;
  *
  */
 public class Session {
-	private String eMail;
+	private String email;
 	private String password;
 	private String tokenUser;
 	private Course actualCourse;
@@ -32,7 +31,7 @@ public class Session {
 	 *            contraseña de usuario
 	 */
 	public Session(String mail, String pass) {
-		this.eMail = mail;
+		this.email = mail;
 		this.password = pass;
 	}
 
@@ -52,27 +51,17 @@ public class Session {
 	 * @throws Exception
 	 */
 	public void setToken() throws Exception {
-		// Gson gson = new Gson();
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
-			HttpGet httpget = new HttpGet(UBUGrades.host + "/login/token.php?username=" + this.eMail + "&password="
+			HttpGet httpget = new HttpGet(UBUGrades.host + "/login/token.php?username=" + this.email + "&password="
 					+ this.password + "&service=" + MoodleOptions.SERVICIO_WEB_MOODLE);
 			CloseableHttpResponse response = httpclient.execute(httpget);
-
-			// en localhost (da error)
-			// HttpGet httpget = new
-			// HttpGet("https://localhost/login/token.php?username=" +
-			// this.eMail + "&password=" + this.password + "&service=" +
-			// OpcionesMoodle.SERVICIO_WEB_MOODLE);
-			// CloseableHttpResponse response = httpclient.execute(httpget);
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
 				JSONObject jsonObject = new JSONObject(respuesta);
 				if (jsonObject != null) {
 					this.tokenUser = jsonObject.getString("token");
 				}
-				// this.tokenUser =
-				// gson.fromJson(respuesta,Token.class).getToken();
 			} finally {
 				response.close();
 			}
@@ -87,7 +76,7 @@ public class Session {
 	 * @return email
 	 */
 	public String getEmail() {
-		return this.eMail;
+		return this.email;
 	}
 
 	/**
@@ -96,7 +85,7 @@ public class Session {
 	 * @param email
 	 */
 	public void setEmail(String email) {
-		this.eMail = email;
+		this.email = email;
 	}
 
 	/**

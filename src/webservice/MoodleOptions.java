@@ -1,4 +1,4 @@
-package model;
+package webservice;
 
 /**
  * Clase que recoge las funciones de servicios web a utilizar.

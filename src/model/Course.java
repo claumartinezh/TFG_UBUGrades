@@ -30,7 +30,7 @@ public class Course implements Serializable {
 	public ArrayList<EnrolledUser> enrolledUsers;
 	public Set<String> roles; // roles que hay en el curso
 	public Set<String> groups; // grupos que hay en el curso
-	public ArrayList<GradeReportLine> gradeReportConfigurationLines;
+	public ArrayList<GradeReportLine> gradeReportLines;
 	public Set<String> typeActivities;
 
 	public Course() {
@@ -50,7 +50,7 @@ public class Course implements Serializable {
 		if (obj.getString("summary") != null)
 			this.summary = obj.getString("summary");
 		this.enrolledUsers = new ArrayList<EnrolledUser>();
-		this.gradeReportConfigurationLines = new ArrayList<GradeReportLine>();
+		this.gradeReportLines = new ArrayList<GradeReportLine>();
 	}
 
 	/**
@@ -263,7 +263,7 @@ public class Course implements Serializable {
 	 * @return lista de gradeReportConfigurationLines
 	 */
 	public ArrayList<GradeReportLine> getGradeReportLines() {
-		return this.gradeReportConfigurationLines;
+		return this.gradeReportLines;
 	}
 
 	/**
@@ -272,9 +272,9 @@ public class Course implements Serializable {
 	 * @param grcl
 	 */
 	public void setGradeReportLines(ArrayList<GradeReportLine> grcl) {
-		this.gradeReportConfigurationLines.clear();
+		this.gradeReportLines.clear();
 		for (GradeReportLine gl : grcl) {
-			this.gradeReportConfigurationLines.add(gl);
+			this.gradeReportLines.add(gl);
 		}
 	}
 
@@ -315,10 +315,10 @@ public class Course implements Serializable {
 	 * 
 	 * @param line
 	 */
-	public void updateGRCLList(GradeReportLine line) {
-		for (int i = 0; i < this.gradeReportConfigurationLines.size(); i++) {
-			if (this.gradeReportConfigurationLines.get(i).getId() == line.getId()) {
-				this.gradeReportConfigurationLines.set(i, line);
+	public void updateGRLList(GradeReportLine line) {
+		for (int i = 0; i < this.gradeReportLines.size(); i++) {
+			if (this.gradeReportLines.get(i).getId() == line.getId()) {
+				this.gradeReportLines.set(i, line);
 			}
 		}
 	}
@@ -333,7 +333,7 @@ public class Course implements Serializable {
 		Course course = null;
 
 		ArrayList<Course> courses = (ArrayList<Course>) UBUGrades.user.getCourses();
-		System.out.println(" Nº de cursos: " + courses.size());
+		//System.out.println(" Nº de cursos: " + courses.size());
 		for (int i = 0; i < courses.size(); i++) {
 			if (courses.get(i).getFullName().equals(courseName)) {
 				course = courses.get(i);

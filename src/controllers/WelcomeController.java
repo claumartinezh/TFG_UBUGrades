@@ -10,6 +10,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Cursor;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
@@ -27,12 +28,12 @@ import model.*;
  */
 public class WelcomeController implements Initializable {
 	@FXML
-	public Label lblUser;
+	private Label lblUser;
 	@FXML
-	public ListView<String> listCourses;
-	ObservableList<String> list;
+	private ListView<String> listCourses;
+	private ObservableList<String> list;
 	@FXML
-	public Label lblNoSelect;
+	private Label lblNoSelect;
 
 	/**
 	 * Función initialize. Muestra la lista de cursos del usuario introducido.
@@ -61,8 +62,10 @@ public class WelcomeController implements Initializable {
 	 * @param event
 	 * @throws Exception
 	 */
-	public void EnterCourse(ActionEvent event) throws Exception {
+	public void enterCourse(ActionEvent event) throws Exception {
 		try {
+			UBUGrades.init.getScene().setCursor(Cursor.WAIT);
+
 			// Guardamos en una variable el curso seleccionado por el usuario
 			String selectedCourse = listCourses.getSelectionModel().getSelectedItem();
 			UBUGrades.session.setActualCourse(Course.getCourseByString(selectedCourse));
@@ -79,14 +82,15 @@ public class WelcomeController implements Initializable {
 			UBUGrades.stage.setScene(scene);
 			UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
 			UBUGrades.stage.setTitle("UBUGrades");
+			UBUGrades.stage.setResizable(true);
 			UBUGrades.stage.show();
+			UBUGrades.init.getScene().setCursor(Cursor.DEFAULT);
 			lblNoSelect.setText("");
-			System.out.println("-- Entrando al curso");
+			//System.out.println("-- Entrando al curso");
 		} catch (Exception e) {
 			lblNoSelect.setText("Debe seleccionar un curso");
 			System.out.println("Debe seleccionar un curso");
 		}
 
 	}
-
 }

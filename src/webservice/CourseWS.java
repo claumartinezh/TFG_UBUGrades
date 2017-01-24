@@ -17,7 +17,6 @@ import controllers.UBUGrades;
 import model.Course;
 import model.EnrolledUser;
 import model.GradeReportLine;
-import model.MoodleOptions;
 
 /**
  * Clase Course para webservices
@@ -91,9 +90,9 @@ public class CourseWS {
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
 				JSONObject jsonArray = new JSONObject(respuesta);
-				// System.out.println(jsonArray.toString());
+				//System.out.println("response: "+jsonArray.toString());
 				// lista de GradeReportConfigurationLines
-				course.gradeReportConfigurationLines = new ArrayList<GradeReportLine>();
+				course.gradeReportLines = new ArrayList<GradeReportLine>();
 				// En esta pila sólo van a entrar Categorías. Se mantendrán en
 				// la pila mientran tengan descendencia.
 				// Una vez añadida al árbol toda la descendencia de un nodo,
@@ -182,7 +181,7 @@ public class CourseWS {
 								// grade =
 								// Float.parseFloat(gradeContainer.getString("content"));
 								grade = getNumber(gradeContainer.getString("content"));
-								// System.out.println(" - Nota item: " + grade);
+								//System.out.println(" - Nota item: " + grade);
 							} /*
 								 * else // Si no tiene nota registrada, se queda
 								 * igual System.out.println("   - No hay nota: "
@@ -234,7 +233,7 @@ public class CourseWS {
 									deque.lastElement().addChild(actualLine);
 								}
 								// Añadimos el elemento a la lista como item
-								course.gradeReportConfigurationLines.add(actualLine);
+								course.gradeReportLines.add(actualLine);
 							} else {
 								// Obtenemos el elemento cabecera de la pila
 								GradeReportLine actualLine = deque.pop();
@@ -243,9 +242,10 @@ public class CourseWS {
 								actualLine.setRangeMin(rangeMin);
 								actualLine.setRangeMax(rangeMax);
 								actualLine.setNameType(typeActivity);
+								actualLine.setGrade(grade);
 								// Modificamos la cabecera de esta suma, para
 								// dejarla como una categoria completa
-								course.updateGRCLList(actualLine);
+								course.updateGRLList(actualLine);
 							}
 
 							/*
@@ -275,10 +275,10 @@ public class CourseWS {
 							deque.add(actualLine);
 							// Añadimos el elemento a la lista como cabecera por
 							// ahora
-							course.gradeReportConfigurationLines.add(actualLine);
+							course.gradeReportLines.add(actualLine);
 						}
 					} // End for
-					course.setActivities(course.gradeReportConfigurationLines);
+					course.setActivities(course.gradeReportLines);
 				} // End if
 			} finally {
 				response.close();

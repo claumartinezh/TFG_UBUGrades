@@ -12,7 +12,6 @@ import org.json.JSONObject;
 
 import controllers.UBUGrades;
 import model.EnrolledUser;
-import model.MoodleOptions;
 
 /**
  * Clase EnrolledUser para webservices.

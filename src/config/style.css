@@ -100,8 +100,28 @@
 }
 
 .label-info{
-	-fx-font-size:11;
+	-fx-font-size:11.0;
 	/*-fx-background-color:#ffff99;*/
-	-fx-margin:15;
-	-fx-padding:0 0 0 8 ;
+	-fx-margin:15.0;
+	-fx-padding:0.0 0.0 0.0 8.0 ;
+}
+
+table {
+    margin-bottom: 3.0em;
+    width: 100.0%;
+    font-family:Arial, Verdana, sans-serif;
+    text-align:center;
+    /*border:0.5px solid #ffa1a7;*/
+}
+th{
+	heigth:20%;
+	font-size:80%;
+    background: #ffa1a7;
+    padding:1%;
+}
+td {
+	font-size:90%;
+	heigth:20%;
+    background: #ffff99;
+    padding:1%;
 }

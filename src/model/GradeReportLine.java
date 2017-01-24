@@ -21,7 +21,7 @@ public class GradeReportLine {
 	private String rangeMin;
 	private String rangeMax;
 	private boolean type; // False = Category, True = Item
-	private String nameType;
+	private String typeName;
 	private ArrayList<GradeReportLine> children;
 	private Activity activity;
 
@@ -65,7 +65,7 @@ public class GradeReportLine {
 		this.rangeMin = rangeMin;
 		this.grade = grade;
 		this.percentage = percentage;
-		this.nameType = nameType;
+		this.typeName = nameType;
 		this.children = new ArrayList<GradeReportLine>();
 	}
 
@@ -245,7 +245,7 @@ public class GradeReportLine {
 	 * @return nameType
 	 */
 	public String getNameType() {
-		return this.nameType;
+		return this.typeName;
 	}
 
 	/**
@@ -254,7 +254,7 @@ public class GradeReportLine {
 	 * @param nameType
 	 */
 	public void setNameType(String nameType) {
-		this.nameType = nameType;
+		this.typeName = nameType;
 	}
 
 	/**
@@ -270,7 +270,7 @@ public class GradeReportLine {
 	 * Crea uan actividad a partir del GradeReportLine
 	 */
 	public void setActivity() {
-		this.activity = new Activity(name, nameType, weight, rangeMin, rangeMax);
+		this.activity = new Activity(name, typeName, weight, rangeMin, rangeMax);
 	}
 
 	/**
@@ -287,8 +287,8 @@ public class GradeReportLine {
 	 * 
 	 * @param kid
 	 */
-	public void addChild(GradeReportLine kid) {
-		this.children.add(kid);
+	public void addChild(GradeReportLine child) {
+		this.children.add(child);
 	}
 
 	/**

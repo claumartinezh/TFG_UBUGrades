@@ -13,7 +13,6 @@ import org.json.JSONObject;
 
 import controllers.UBUGrades;
 import model.Course;
-import model.MoodleOptions;
 import model.MoodleUser;
 
 /**

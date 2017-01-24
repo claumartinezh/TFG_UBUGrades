@@ -41,6 +41,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import model.EnrolledUser;
@@ -56,6 +58,9 @@ import webservice.CourseWS;
  *
  */
 public class MainController implements Initializable {
+
+	// static final Logger logger = (Logger)
+	// LoggerFactory.getLogger(MainController.class);
 
 	@FXML
 	public AnchorPane canvas;
@@ -112,6 +117,13 @@ public class MainController implements Initializable {
 	@FXML // Media
 	private CheckBox checkAverage;
 	private XYChart.Series<String, Number> average;
+	@FXML
+	private AnchorPane Content2;
+	@FXML
+	private WebView webView;
+	private WebEngine engine;
+	// private WebEngine engine = webView.getEngine();
+	// URL url = getClass().getResource("./config/pagina.html");
 
 	/**
 	 * Muestra los usuarios matriculados en el curso, así como las actividades
@@ -120,9 +132,16 @@ public class MainController implements Initializable {
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
+			// webView = new WebView();
+			engine = webView.getEngine();
+			// webView.getEngine().load(url.toString());
+			// webView.getEngine().load(getClass().getResource("../config/pagina.html").toString());
+			// engine.load(getClass().getResource("../config/pagina.html").toString());
+			// engine.loadContent("<h1>Hola</h1>");
+			//System.out.println("WebView: " + engine.getLocation() + " " + engine.getTitle());
+			//System.out.println("Carpeta: " + location.toString());
 			// Establecemos los elementos de los cursos
 			CourseWS.setEnrolledUsers(UBUGrades.session.getToken(), UBUGrades.session.getActualCourse());
-			;
 			// Estableciendo calificador
 			CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(),
 					UBUGrades.session.getActualCourse().getEnrolledUsers().get(0).getId(),
@@ -258,7 +277,6 @@ public class MainController implements Initializable {
 			 */
 
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -286,8 +304,14 @@ public class MainController implements Initializable {
 				// Por cada participante seleccionado
 				// Recalculamos el gráfico
 				lineChart.getData().clear();
+				// Contenido HTML
+				// engine.loadContent();
+				String htmlTitle = "<tr><th style='background:#f2f2f2'>  </th>";
+				String content = "";
+				int countA = 0;
 				for (EnrolledUser actualUser : selectedParticipants) {
 					// Establecemos el configurador del curso con este usuario
+					String htmlRow = "<th style='background:#96bbe4'> " + actualUser.getFullName() + " </th>";
 					try {
 						CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(), actualUser.getId(),
 								UBUGrades.session.getActualCourse());
@@ -297,7 +321,6 @@ public class MainController implements Initializable {
 						 * getToken(), actualUser.getId());
 						 */
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
 					} /*
 						 * System.out.println();
@@ -308,19 +331,30 @@ public class MainController implements Initializable {
 					// Mostramos el gráfico
 					XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 					series.setName(actualUser.getFullName());
+
+					int countB = 1;
 					for (TreeItem<GradeReportLine> structTree : selectedGRL) {
+						// htmlRow = "<tr>";
+						countA++;
 						for (GradeReportLine actualLine : UBUGrades.session.getActualCourse().getGradeReportLines()) {
+
 							// Por cada actividad que haya seleccionada,
 							// lo buscamos en la estructura y obtenemos
 							// los valores necesarios
 							if (structTree.getValue().getId() == actualLine.getId()) {
-								// float calculatedGrade =
-								// actualLine.getGrade();
-								// TODO No saca bien la nota de la categoría
 								float calculatedGrade = (actualLine.getGrade()
 										/ Float.valueOf(actualLine.getRangeMax())) * 10;
 								series.getData()
 										.add(new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
+								// System.out.println(countA + " " + countB);
+								if (countA == countB) {
+									htmlTitle += "<th> " + actualLine.getName() + " </th>";
+									countB++;
+								}
+
+								htmlRow += "<td> " + Math.round(calculatedGrade * 100.0) / 100.0 + " </td>";
+								// System.out.println("HT: "+htmlTitle);
+								// System.out.println("HR: "+htmlRow);
 								/*
 								 * System.out.println(" " +
 								 * actualLine.getName());
@@ -337,9 +371,20 @@ public class MainController implements Initializable {
 								 */
 							}
 						}
+						// htmlTitle = "</td>";
+
 					}
+					htmlTitle += "</tr>";
 					lineChart.getData().add(series);
+					htmlRow += "</tr>";
+					content += htmlRow;
 				}
+				engine.setUserStyleSheetLocation(getClass().getResource("./../config/style.css").toString());
+				engine.loadContent("<html><head></head><body style='background-color:#f2f2f2'><table>" + htmlTitle + content + "</table></body></html>");
+				// System.out.println("<html><head></head><body><table>"+htmlTitle+content+"</table></body></html>");
+
+				// Recalculamos la tabla
+
 				/*
 				 * if(checkAverage.isSelected())
 				 * lineChart.getData().add(average);
@@ -390,7 +435,11 @@ public class MainController implements Initializable {
 					selectedGRL.add(tvwGradeReport.getRoot());
 				} else {
 					lineChart.getData().clear();
+					String htmlTitle = "<tr><th style='background:#f2f2f2'>  </th>";
+					String content = "";
+					int countA = 0;
 					for (EnrolledUser actualUser : selectedParticipants) {
+						String htmlRow = "<th style='background:#96bbe4'> " + actualUser.getFullName() + " </th>";
 						try {
 							CourseWS.setGradeReportConfigurationLines(UBUGrades.session.getToken(), actualUser.getId(),
 									UBUGrades.session.getActualCourse());
@@ -400,7 +449,6 @@ public class MainController implements Initializable {
 							 * session.getToken(), actualUser.getId());
 							 */
 						} catch (Exception e) {
-							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 						/*
@@ -409,7 +457,9 @@ public class MainController implements Initializable {
 						 */
 						XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
 						series.setName(actualUser.getFullName());
+						int countB = 1;
 						for (TreeItem<GradeReportLine> structTree : selectedGRL) {
+							countA++;
 							for (GradeReportLine actualLine : UBUGrades.session.getActualCourse()
 									.getGradeReportLines()) {
 								if (structTree.getValue().getId() == actualLine.getId()) {
@@ -422,6 +472,16 @@ public class MainController implements Initializable {
 									// System.out.println(calculatedGrade);
 									series.getData().add(
 											new XYChart.Data<String, Number>(actualLine.getName(), calculatedGrade));
+
+									// System.out.println(countA + " " + countB
+									// + " "
+									// +Float.toString(actualLine.getGrade()));
+									if (countA == countB) {
+										htmlTitle += "<th> " + actualLine.getName() + " </th>";
+										countB++;
+									}
+
+									htmlRow += "<td> " + Math.round(calculatedGrade * 100.0) / 100.0 + " </td>";
 									/*
 									 * System.out.println(" " +
 									 * actualLine.getName());
@@ -440,8 +500,16 @@ public class MainController implements Initializable {
 
 							}
 						}
+						//lineChart.getData().add(series);
+						htmlTitle += "</tr>";
 						lineChart.getData().add(series);
+						htmlRow += "</tr>";
+						content += htmlRow;
 					}
+					engine.setUserStyleSheetLocation(getClass().getResource("./../config/style.css").toString());
+					engine.loadContent(
+							"<html><head><body style='background-color:#f2f2f2'></head><body><table>" + htmlTitle + content + "</table></body></html>");
+					// System.out.println("<html><head></head><body><table>"+htmlTitle+content+"</table></body></html>");
 				}
 				System.out.println();
 				/*
@@ -605,25 +673,20 @@ public class MainController implements Initializable {
 			 * }
 			 */
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		listParticipants.setItems(list);
 	}
 
 	/**
-	 * Rellena recursivamente el árbol de actividades
-	 * (GradeReportConfigurationLines)
+	 * Rellena el árbol de actividades (GradeReportLines). Obtiene los hijos de
+	 * la línea pasada por parámetro, los transforma en treeitems y los
+	 * establece como hijos del elemento treeItem equivalente de line
 	 * 
 	 * @param parent
 	 * @param line
 	 */
 	public void setTreeview(TreeItem<GradeReportLine> parent, GradeReportLine line) {
-		/*
-		 * Obtiene los hijos de la linea pasada por parametro Los transforma en
-		 * treeitems y los establece como hijos del elemento treeItem
-		 * equivalente de line
-		 */
 		for (int j = 0; j < line.getChildren().size(); j++) {
 			TreeItem<GradeReportLine> item = new TreeItem<GradeReportLine>(line.getChildren().get(j));
 			MainController.setIcon(item);
@@ -752,7 +815,6 @@ public class MainController implements Initializable {
 			// Establecemos la raiz del treeview
 			tvwGradeReport.setRoot(root);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		listParticipants.setItems(list);
@@ -830,7 +892,6 @@ public class MainController implements Initializable {
 	public void saveChart(ActionEvent actionEvent) throws Exception {
 		WritableImage image = lineChart.snapshot(new SnapshotParameters(), null);
 
-		// TODO: probably use a file chooser here
 		File file = new File("chart.png");
 
 		FileChooser fileChooser = new FileChooser();
@@ -847,13 +908,78 @@ public class MainController implements Initializable {
 				}
 			}
 		} catch (Exception e) {
-			// TODO: handle exception here
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Exporta la tabla de calificaciones. El usuario podrá elegir entre el formato .png o .jpg
+	 * para guardar la imagen.
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void saveTable(ActionEvent actionEvent) throws Exception {
+		WritableImage image = webView.snapshot(new SnapshotParameters(), null);
+
+		File file = new File("table.png");
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Guardar gráfico");
+		fileChooser.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("All Files", "*.*"),
+				new FileChooser.ExtensionFilter("*.jpg", "*.jpg"), new FileChooser.ExtensionFilter("*.png", "*.png"));
+		try {
+			file = fileChooser.showSaveDialog(UBUGrades.stage);
+			if (file != null) {
+				try {
+					ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+				} catch (IOException ex) {
+					System.out.println(ex.getMessage());
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
 	/**
-	 * Botón de la barra de herramientas "Acerca de UBUGrades". Abre en el
-	 * navegador el repositorio del proyecto.
+	 * Vuelve a la ventana de login de usuario
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void logOut(ActionEvent actionEvent) throws Exception {
+		FXMLLoader loader = new FXMLLoader();
+		loader.setLocation(getClass().getResource("./../view/Login.fxml"));
+		// UBUGrades.stage.getScene() setCursor(Cursor.WAIT);
+		UBUGrades.stage.close();
+		System.out.println("Cerrando sesión de usuario");
+		UBUGrades.stage = new Stage();
+		Parent root = loader.load();
+		// root.setCursor(Cursor.WAIT);
+		Scene scene = new Scene(root);
+		UBUGrades.stage.setScene(scene);
+		UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+		UBUGrades.stage.setTitle("UBUGrades");
+		UBUGrades.stage.show();
+	}
+
+	/**
+	 * Deja de seleccionar los participantes/actividades y borra el gráfico.
+	 * 
+	 * @param actionEvent
+	 * @throws Exception
+	 */
+	public void clearSelection(ActionEvent actionEvent) throws Exception {
+		listParticipants.getSelectionModel().clearSelection();
+		tvwGradeReport.getSelectionModel().clearSelection();
+		lineChart.getData().clear();
+		lineChart.setCreateSymbols(false);
+		engine.loadContent("<html><head></head><body style='background-color:#f2f2f2'></body></html>");
+
+	}
+
+	/**
+	 * Abre en el navegador el repositorio del proyecto.
 	 * 
 	 * @param actionEvent
 	 * @throws Exception
@@ -872,4 +998,5 @@ public class MainController implements Initializable {
 		System.out.println("Cerrando aplicación");
 		UBUGrades.stage.close();
 	}
+
 }
