@@ -5,7 +5,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 /**
- * Clase Quiz (Cuestionario). Hereda de Activity.
+ * Clase Quiz (Cuestionario). Implementar en versiones futuras.
  * 
  * @author Claudia Martínez Herrero
  *

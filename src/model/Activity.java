@@ -5,7 +5,7 @@ import java.io.Serializable;
 import org.json.JSONObject;
 
 /**
- * Clase Activity. Podrá ser Tarea, Quiz, Foro...
+ * Clase Activity. Implementar en el futuro.
  * 
  * @author Claudia Martínez Herrero
  *

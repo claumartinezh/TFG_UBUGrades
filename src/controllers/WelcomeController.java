@@ -2,6 +2,7 @@ package controllers;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.ResourceBundle;
 
 import javafx.collections.FXCollections;
@@ -42,15 +43,15 @@ public class WelcomeController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
 			lblUser.setText(UBUGrades.user.getFullName());
-			System.out.println("RMS: Cargando cursos");
+			System.out.println("Cargando cursos...");
 			ArrayList<String> nameCourses = new ArrayList<String>();
 			for (int i = 0; i < UBUGrades.user.getCourses().size(); i++) {
 				nameCourses.add(UBUGrades.user.getCourses().get(i).getFullName());
 			}
+			Collections.sort(nameCourses);
+
 			list = FXCollections.observableArrayList(nameCourses);
-			System.out.println("-- Mostrando Cursos");
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		listCourses.setItems(list);
@@ -72,21 +73,23 @@ public class WelcomeController implements Initializable {
 			System.out.println(" Curso seleccionado: " + UBUGrades.session.getActualCourse().getFullName());
 
 			// Accedemos a la siguiente ventana:
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("./../view/Main.fxml"));
+			// FXMLLoader loader = new FXMLLoader();
+			// loader.setLocation(getClass().getResource("../view/Main.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Main.fxml"));
+
 			UBUGrades.stage.close();
 			UBUGrades.stage = new Stage();
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			UBUGrades.stage.setScene(scene);
-			UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+			UBUGrades.stage.getIcons().add(new Image("/img/logo_min.png"));
 			UBUGrades.stage.setTitle("UBUGrades");
 			UBUGrades.stage.setResizable(true);
 			UBUGrades.stage.show();
 			UBUGrades.init.getScene().setCursor(Cursor.DEFAULT);
 			lblNoSelect.setText("");
-			//System.out.println("-- Entrando al curso");
+			// System.out.println("-- Entrando al curso");
 		} catch (Exception e) {
 			lblNoSelect.setText("Debe seleccionar un curso");
 			System.out.println("Debe seleccionar un curso");

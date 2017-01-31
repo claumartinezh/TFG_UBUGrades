@@ -13,8 +13,8 @@ import controllers.UBUGrades;
 
 /**
  * Clase curso (asignatura). Cada curso tiene un calificador (compuesto por
- * líneas de calificación); y varios grupos, roles de participantes, y tipos de
- * actividades.
+ * líneas de calificación o GradeReportLines); y varios grupos, roles de
+ * participantes, y tipos de actividades.
  * 
  * @author Claudia Martínez Herrero
  *
@@ -167,7 +167,7 @@ public class Course implements Serializable {
 	 * @return lista de usuarios
 	 */
 	public ArrayList<EnrolledUser> getEnrolledUsers() {
-		Collections.sort(this.enrolledUsers, (o1, o2) -> o1.getFullName().compareTo(o2.getFullName()));
+		Collections.sort(this.enrolledUsers, (o1, o2) -> o1.getLastName().compareTo(o2.getLastName()));
 		return this.enrolledUsers;
 	}
 
@@ -333,7 +333,7 @@ public class Course implements Serializable {
 		Course course = null;
 
 		ArrayList<Course> courses = (ArrayList<Course>) UBUGrades.user.getCourses();
-		//System.out.println(" Nº de cursos: " + courses.size());
+		// System.out.println(" Nº de cursos: " + courses.size());
 		for (int i = 0; i < courses.size(); i++) {
 			if (courses.get(i).getFullName().equals(courseName)) {
 				course = courses.get(i);

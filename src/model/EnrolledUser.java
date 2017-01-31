@@ -14,8 +14,8 @@ import org.json.JSONObject;
  */
 public class EnrolledUser {
 	private int id;
-	// private String firstName;
-	// private String lastName;
+	private String firstName;
+	private String lastName;
 	private String fullName;
 	// private String email;
 	private Date firstAccess;
@@ -41,6 +41,13 @@ public class EnrolledUser {
 	 */
 	public EnrolledUser(String token, JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
+
+		if (obj.getString("firstname") != null)
+			this.firstName = obj.getString("firstname");
+
+		if (obj.getString("lastname") != null)
+			this.lastName = obj.getString("lastname");
+
 		/*
 		 * if (obj.getString("firstname") != null) this.firstName =
 		 * obj.getString("firstname"); if (obj.getString("lastname") != null)
@@ -116,6 +123,22 @@ public class EnrolledUser {
 	 */
 	public void setId(int id) {
 		this.id = id;
+	}
+
+	public String getFirstName() {
+		return this.firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return this.lastName;
+	}
+
+	public void setlastName(String lastName) {
+		this.lastName = lastName;
 	}
 
 	/**
@@ -347,6 +370,6 @@ public class EnrolledUser {
 	 * Convierte el EnrolledUser a un String con su nombre
 	 */
 	public String toString() {
-		return this.getFullName();
+		return this.getLastName() + ", " + this.getFirstName();
 	}
 }

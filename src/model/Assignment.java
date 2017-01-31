@@ -5,7 +5,7 @@ import java.util.Date;
 import org.json.JSONObject;
 
 /**
- * Clase Assignment (Tarea). Hereda de la clase Activity.
+ * Clase Assignment (Tarea). Implementar versiones futuras.
  * 
  * @author Claudia Martínez Herrero
  *

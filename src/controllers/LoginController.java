@@ -76,12 +76,9 @@ public class LoginController {
 						// Load GUI
 						try {
 							// Accedemos a la siguiente ventana
-							FXMLLoader loader = new FXMLLoader();
-							loader.setLocation(getClass().getResource("./../view/Welcome.fxml"));
-							// UBUGrades.stage.getScene()
-							// setCursor(Cursor.WAIT);
-							// UBUGrades.stage.close();
-							System.out.println("Accediendo a UBUGrades...");
+							// FXMLLoader loader = new FXMLLoader();
+							// loader.setLocation(getClass().getResource("../view/Welcome.fxml"));
+							FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Welcome.fxml"));
 
 							UBUGrades.stage = new Stage();
 
@@ -89,7 +86,7 @@ public class LoginController {
 							// root.setCursor(Cursor.WAIT);
 							Scene scene = new Scene(root);
 							UBUGrades.stage.setScene(scene);
-							UBUGrades.stage.getIcons().add(new Image("./img/logo_min.png"));
+							UBUGrades.stage.getIcons().add(new Image("/img/logo_min.png"));
 							UBUGrades.stage.setTitle("UBUGrades");
 							UBUGrades.init.close();
 							UBUGrades.stage.show();
@@ -133,7 +130,7 @@ public class LoginController {
 				updateProgress(2, 3);
 				updateProgress(3, 3);
 				UBUGrades.init.getScene().setCursor(Cursor.DEFAULT);
-				Thread.sleep(200);
+				Thread.sleep(100);
 				updateMessage("end");
 				return true;
 			}

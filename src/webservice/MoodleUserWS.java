@@ -16,7 +16,8 @@ import model.Course;
 import model.MoodleUser;
 
 /**
- * Clase MoodleUser para webservices
+ * Clase MoodleUser para webservices. Recoge funciones útiles para servicios web
+ * relacionados con un MoodleUser.
  * 
  * @author Claudia Martínez Herrero
  *

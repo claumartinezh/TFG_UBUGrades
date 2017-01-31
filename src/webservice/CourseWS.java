@@ -19,7 +19,8 @@ import model.EnrolledUser;
 import model.GradeReportLine;
 
 /**
- * Clase Course para webservices
+ * Clase Course para webservices. Recoge funciones útiles para servicios web
+ * relacionados con un curso.
  * 
  * @author Claudia Martínez Herrero
  *
@@ -78,7 +79,7 @@ public class CourseWS {
 	 * @param userId
 	 * @throws Exception
 	 */
-	public static void setGradeReportConfigurationLines(String token, int userId, Course course) throws Exception {
+	public static void setGradeReportLines(String token, int userId, Course course) throws Exception {
 		CloseableHttpClient httpclient = HttpClients.createDefault();
 		try {
 			String call = UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
@@ -90,7 +91,7 @@ public class CourseWS {
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
 				JSONObject jsonArray = new JSONObject(respuesta);
-				//System.out.println("response: "+jsonArray.toString());
+				// System.out.println("response: "+jsonArray.toString());
 				// lista de GradeReportConfigurationLines
 				course.gradeReportLines = new ArrayList<GradeReportLine>();
 				// En esta pila sólo van a entrar Categorías. Se mantendrán en
@@ -103,11 +104,6 @@ public class CourseWS {
 					JSONArray tables = (JSONArray) jsonArray.get("tables");
 					JSONObject alumn = (JSONObject) tables.get(0);
 
-					// System.out.println("FA:");
-
-					// System.out.println(alumn);
-					// System.out.println();
-
 					JSONArray tableData = (JSONArray) alumn.getJSONArray("tabledata");
 					/*
 					 * System.out.println("TableData:");
@@ -117,45 +113,33 @@ public class CourseWS {
 					// (que convertiremos a GradeReportConfigurationLines)
 					for (int i = 0; i < tableData.length(); i++) {
 						JSONObject tableDataElement = tableData.getJSONObject(i);
-						/*
-						 * System.out.println("Leader or feedback:");
-						 * System.out.println(leaderOrFeedback);
-						 */
 						// sea categoría o item, se saca de la misma manera el
 						// nivel del itemname
 						JSONObject itemname = tableDataElement.getJSONObject("itemname");
 						int actualLevel = getActualLevel(itemname.getString("class"));
 						int idLine = getIdLine(itemname.getString("id"));
-						/*
-						 * System.out.println("");
-						 * System.out.println("   - Nivel de la línea: " +
-						 * actualLevel);
-						 */
-						// --- Si es un feedback (item o suma de
+						// Si es un feedback (item o suma de
 						// calificaciones):
 						if (tableDataElement.isNull("leader")) {
 							String nameContainer = itemname.getString("content");
 							String nameLine = "";
 							String typeActivity = "";
-							boolean typeLine = false; // true si es un item,
-														// false si es una
-														// categoría
+							// true=item, false=categoría
+							boolean typeLine = false;
 							// Si es una actividad (assignment o quiz)
 							// Se reconocen por la etiqueta "<a"
 							if (nameContainer.substring(0, 2).equals("<a")) {
-								// System.out.println(" - Es un assignment o
-								// quiz");
 								nameLine = getNameActivity(nameContainer);
-								if (assignmentOrQuiz(nameContainer).equals("assignment"))
+								if (assignmentOrQuizOrForum(nameContainer).equals("assignment"))
 									typeActivity = "Assignment";
-								else if (assignmentOrQuiz(nameContainer).equals("quiz"))
+								else if (assignmentOrQuizOrForum(nameContainer).equals("quiz"))
 									typeActivity = "Quiz";
+								else if (assignmentOrQuizOrForum(nameContainer).equals("forum"))
+									typeActivity = "Forum";
 								typeLine = true;
 							} else {
 								// Si es un item manual o suma de calificaciones
 								// Se reconocen por la etiqueta "<span"
-								// System.out.println(" - Es un item manual o
-								// suma de calificaciones");
 								nameLine = getNameManualItemOrEndCategory(nameContainer);
 								if (manualItemOrEndCategory(nameContainer).equals("manualItem")) {
 									typeActivity = "ManualItem";
@@ -165,49 +149,29 @@ public class CourseWS {
 									typeLine = false;
 								}
 							}
-							/*
-							 * System.out.println("   - Nombre de la línea: " +
-							 * nameLine); System.out.println("   - Tipo : " +
-							 * typeActivity);
-							 */
-
 							// Sacamos la nota (grade)
 							JSONObject gradeContainer = tableDataElement.getJSONObject("grade");
-							Float grade = Float.NaN;
-							// Si hay nota numérica
-							// System.out.println(tableDataElement);
-							// System.out.println(gradeContainer.getString("content"));
+							String grade = "-";
+							// Si no hay nota numérica
 							if (!gradeContainer.getString("content").contains("-")) {
-								// grade =
 								// Float.parseFloat(gradeContainer.getString("content"));
 								grade = getNumber(gradeContainer.getString("content"));
-								//System.out.println(" - Nota item: " + grade);
-							} /*
-								 * else // Si no tiene nota registrada, se queda
-								 * igual System.out.println("   - No hay nota: "
-								 * + grade);
-								 */
+								// System.out.println(" - Nota item: " + grade);
+							}
 
 							// Sacamos el porcentaje
 							JSONObject percentageContainer = tableDataElement.getJSONObject("percentage");
 							Float percentage = Float.NaN;
 							if (!percentageContainer.getString("content").contains("-")) {
-								percentage = getNumber(percentageContainer.getString("content"));
-								// System.out.println(" - Nota item: " +
-								// percentage);
+								percentage = getFloat(percentageContainer.getString("content"));
 							}
-							/*
-							 * else{ System.out.
-							 * println("   - No hay nota porcentaje: " +
-							 * percentage); }
-							 */
 							// Sacamos el peso
 							// RMS Changed
 							JSONObject weightContainer = tableDataElement.optJSONObject("weight");
 							Float weight = Float.NaN;
 							if (weightContainer != null) {
 								if (!weightContainer.getString("content").contains("-")) {
-									weight = getNumber(weightContainer.getString("content"));
+									weight = getFloat(weightContainer.getString("content"));
 									// System.out.println(" - Nota item: " +
 									// weight);
 								} /*
@@ -247,28 +211,15 @@ public class CourseWS {
 								// dejarla como una categoria completa
 								course.updateGRLList(actualLine);
 							}
-
-							/*
-							 * System.out.println(feedback);
-							 * System.out.println("");
-							 * System.out.println(itemname);
-							 */
-
 							// --- Si es una categoría
 						} else {
-							// System.out.println(" - Tipo : Categoría");
 							String nameLine = getNameCategorie(itemname.getString("content"));
-
-							// System.out.println(" - Nombre de la línea: " +
-							// nameLine);
 
 							// Añadimos la cabecera de la categoria a la pila
 							GradeReportLine actualLine = new GradeReportLine(idLine, nameLine, actualLevel, false);
 							// Lo añadimos como hijo de la categoria anterior
 							if (!deque.isEmpty()) {
-								// System.out.println(deque.lastElement().getName());
 								deque.lastElement().addChild(actualLine);
-
 							}
 
 							// Añadimos esta cabecera a la pila
@@ -320,8 +271,7 @@ public class CourseWS {
 	public static String getNameCategorie(String data) {
 		String result = "";
 		// busco el final de la cadena única a partir de la cual empieza el
-		// nombre
-		// de la categoría
+		// nombre de la categoría
 		int begin = data.lastIndexOf("/>") + 2;
 		// el nombre termina al final de todo el texto
 		int end = data.length();
@@ -390,10 +340,8 @@ public class CourseWS {
 	public static String getRange(String data, boolean option) {
 		String[] ranges = data.split("&ndash;");
 		if (option) // true = rango mínimo
-			// return Float.parseFloat(ranges[0]);
 			return ranges[0];
 		else // false = rango máximo
-				// return Float.parseFloat(ranges[1]);
 			return ranges[1];
 	}
 
@@ -419,12 +367,14 @@ public class CourseWS {
 	 * @param nameContainer
 	 * @return true si es un assignment, false si es un quiz
 	 */
-	private static String assignmentOrQuiz(String data) {
+	private static String assignmentOrQuizOrForum(String data) {
 		String url = data.substring(data.lastIndexOf("href="), data.indexOf("?id="));
 		if (url.contains("mod/assign")) {
 			return "assignment";
 		} else if (url.contains("mod/quiz"))
 			return "quiz";
+		else if (url.contains("mod/forum"))
+			return "forum";
 		else
 			return "";
 	}
@@ -451,15 +401,30 @@ public class CourseWS {
 	 * @param data
 	 * @return
 	 */
-	private static Float getNumber(String data) {
+	public static Float getFloat(String data) {
 		Pattern pattern = Pattern.compile("[0-9]{1,3},{1}[0-9]{1,2}");
-		// Pattern pattern = Pattern.compile("[0-9]{1,2}");
 		Matcher match = pattern.matcher(data);
 		if (match.find()) {
-			// System.out.println(data.substring(match.start(),match.end()));
 			return Float.parseFloat(data.substring(match.start(), match.end()).replace(",", "."));
 		}
 		return Float.NaN;
+
+	}
+
+	/**
+	 * Devuelve el numero, con el formato especificado, encontrado en la cadena
+	 * pasada Si no es un numero devuelve todo el contenido
+	 * 
+	 * @param data
+	 * @return
+	 */
+	private static String getNumber(String data) {
+		Pattern pattern = Pattern.compile("[0-9]{1,3},{1}[0-9]{1,2}");
+		Matcher match = pattern.matcher(data);
+		if (match.find()) {
+			return data.substring(match.start(), match.end());
+		}
+		return data;
 
 	}
 }

@@ -26,14 +26,15 @@ public class UBUGrades extends Application {
 	public void start(Stage primaryStage) {
 		try {
 			System.out.println("[Bienvenido a UBUGrades]");
-			FXMLLoader loader = new FXMLLoader();
-			loader.setLocation(getClass().getResource("./../view/Login.fxml"));
+			// FXMLLoader loader = new FXMLLoader();
+			// loader.setLocation(getClass().getResource("../view/Login.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Login.fxml"));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
 			// scene.getStylesheets().add(UBUGrades.class.getResource("/config/style.css").toExternalForm());
 			init = primaryStage;
 			init.setScene(scene);
-			init.getIcons().add(new Image("./img/logo_min.png"));
+			init.getIcons().add(new Image("/img/logo_min.png"));
 			UBUGrades.init.setTitle("UBUGrades");
 			init.show();
 		} catch (Exception e) {

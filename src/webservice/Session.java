@@ -11,7 +11,8 @@ import controllers.UBUGrades;
 import model.Course;
 
 /**
- * Clase sesión. Obtiene el token de usuario y guarda sus parámetros
+ * Clase sesión. Obtiene el token de usuario y guarda sus parámetros. Establece
+ * la sesión.
  * 
  * @author Claudia Martínez Herrero
  *

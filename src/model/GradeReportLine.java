@@ -15,7 +15,7 @@ public class GradeReportLine {
 	private int id;
 	private String name;
 	private int level;
-	private float grade;
+	private String grade;
 	private float percentage;
 	private float weight;
 	private String rangeMin;
@@ -55,7 +55,7 @@ public class GradeReportLine {
 	 */
 	// RMS changed types float to String in ranges
 	public GradeReportLine(int id, String name, int level, boolean type, float weight, String rangeMin, String rangeMax,
-			float grade, float percentage, String nameType) {
+			String grade, float percentage, String nameType) {
 		this.id = id;
 		this.name = name;
 		this.level = level;
@@ -128,7 +128,7 @@ public class GradeReportLine {
 	 * 
 	 * @return grade
 	 */
-	public float getGrade() {
+	public String getGrade() {
 		return grade;
 	}
 
@@ -137,7 +137,7 @@ public class GradeReportLine {
 	 * 
 	 * @param grade
 	 */
-	public void setGrade(float grade) {
+	public void setGrade(String grade) {
 		this.grade = grade;
 	}
 

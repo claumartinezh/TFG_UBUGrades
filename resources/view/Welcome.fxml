@@ -10,16 +10,16 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="anchorpane" stylesheets="@../config/style.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WelcomeController">
+<AnchorPane prefHeight="600.0" prefWidth="800.0" styleClass="anchorpane" stylesheets="@/css/style.css" xmlns="http://javafx.com/javafx/8.0.60" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controllers.WelcomeController">
 	<children>
       <ImageView fitHeight="68.0" fitWidth="350.0" layoutX="301.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../img/titulo.png" />
+            <Image url="@/img/titulo.png" />
          </image>
       </ImageView>
       <ImageView fitHeight="161.0" fitWidth="161.0" layoutX="123.0" layoutY="26.0" pickOnBounds="true" preserveRatio="true">
          <image>
-            <Image url="@../img/logo_min.png" />
+            <Image url="@/img/logo_min.png" />
          </image>
       </ImageView>
 		<Label layoutX="299.0" layoutY="120.0" text="Bienvenida/o,">
@@ -32,7 +32,7 @@
 				<Font size="27.0" />
 			</font>
 		</Label>
-		<ListView fx:id="listCourses" layoutX="137.0" layoutY="196.0" prefHeight="265.0" prefWidth="540.0" styleClass="list-view-intro" stylesheets="@../config/style.css">
+		<ListView fx:id="listCourses" layoutX="137.0" layoutY="196.0" prefHeight="265.0" prefWidth="540.0" styleClass="list-view-intro" stylesheets="@/css/style.css">
          <cursor>
             <Cursor fx:constant="DEFAULT" />
          </cursor></ListView>
@@ -41,7 +41,7 @@
 				<Font size="15.0" />
 			</font>
 		</Label>
-		<Button fx:id="btnEntrar" layoutX="364.0" layoutY="479.0" mnemonicParsing="false" onAction="#enterCourse" prefHeight="39.0" prefWidth="86.0" style="-fx-font-size: 16;" styleClass="rich-blue" stylesheets="@../config/style.css" text="Entrar">
+		<Button fx:id="btnEntrar" layoutX="364.0" layoutY="479.0" mnemonicParsing="false" onAction="#enterCourse" prefHeight="39.0" prefWidth="86.0" style="-fx-font-size: 16;" styleClass="rich-blue" stylesheets="@/css/style.css" text="Entrar">
 			<font>
 				<Font size="19.0" />
 			</font>
