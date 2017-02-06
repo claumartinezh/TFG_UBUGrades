@@ -8,6 +8,7 @@ import java.util.List;
  * Clase para el usuario logeado en la aplicación
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class MoodleUser {
@@ -61,38 +62,6 @@ public class MoodleUser {
 		this.setCountry(country);
 		this.courses = new ArrayList<Course>();
 	}
-	/*
-	 * public MoodleUser(String token, String eMail) throws Exception { // Gson
-	 * gson = new Gson(); CloseableHttpClient httpclient =
-	 * HttpClients.createDefault(); try { HttpGet httpget = new
-	 * HttpGet(UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token +
-	 * "&moodlewsrestformat=json&wsfunction=" +
-	 * MoodleOptions.OBTENER_INFO_USUARIO + "&field=email&values[0]=" + eMail);
-	 * CloseableHttpResponse response = httpclient.execute(httpget);
-	 * 
-	 * try { String respuesta = EntityUtils.toString(response.getEntity()); //
-	 * System.out.println(respuesta); // this.tokenUser = //
-	 * gson.fromJson(respuesta,Token.class).getToken(); // this.userId = //
-	 * gson.fromJson(respuesta,Curso.class).getUserId(); JSONArray jsonArray =
-	 * new JSONArray(respuesta); // JSONObject jsonObject = new
-	 * JSONObject(respuestaHTTP); if (jsonArray != null) { JSONObject jsonObject
-	 * = (JSONObject) jsonArray.get(0); if (jsonObject != null) { this.id =
-	 * jsonObject.getInt("id"); if (jsonObject.getString("username") != null)
-	 * this.userName = jsonObject.getString("username"); if
-	 * (jsonObject.getString("fullname") != null) this.fullName =
-	 * jsonObject.getString("fullname"); if (jsonObject.getString("email") !=
-	 * null) this.email = jsonObject.getString("email"); if (new
-	 * Date(jsonObject.getLong("firstaccess")) != null) this.firstAccess = new
-	 * Date(jsonObject.getLong("firstaccess") * 1000); if (new
-	 * Date(jsonObject.getLong("lastaccess")) != null) this.lastAccess = new
-	 * Date(jsonObject.getLong("lastaccess") * 1000); /* if
-	 * (jsonObject.getString("city") != null) this.city =
-	 * jsonObject.getString("city"); if (jsonObject.getString("country") !=
-	 * null) this.country = jsonObject.getString("country");
-	 *
-	 * this.courses = new ArrayList<Course>(); } } } finally { response.close();
-	 * } } finally { httpclient.close(); } this.setCourses(token); }
-	 */
 
 	/**
 	 * Devuelve el id del usuario

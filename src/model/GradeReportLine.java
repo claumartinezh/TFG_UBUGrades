@@ -3,15 +3,15 @@ package model;
 import java.util.ArrayList;
 
 /**
- * Clase GradeReportLine. Representa a una línea en el calificador de un alumno.
- * Cada línea se compone de su id, nombre, nivel, nota, porcentaje, peso, rango
- * y tipo principalmente.
+ * Clase GradeReportLine (GRL). Representa a una línea en el calificador de un
+ * alumno. Cada línea se compone de su id, nombre, nivel, nota, porcentaje,
+ * peso, rango y tipo principalmente.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class GradeReportLine {
-	// private ArrayList<Node> nodes;
 	private int id;
 	private String name;
 	private int level;
@@ -26,13 +26,17 @@ public class GradeReportLine {
 	private Activity activity;
 
 	/**
-	 * Constructor de categorias con 4 parámetros. Se le añaden a posteriori los
-	 * elementos de su suma de calificaciones
+	 * Constructor GRL con 4 parámetros. Se le añaden a posteriori los elementos
+	 * de su suma de calificaciones
 	 * 
 	 * @param id
+	 *            id de la categoría
 	 * @param name
+	 *            nombre de la categoría
 	 * @param level
+	 *            nivel de profundidad
 	 * @param type
+	 *            categoría o item
 	 */
 	public GradeReportLine(int id, String name, int level, boolean type) {
 		this.id = id;
@@ -43,17 +47,23 @@ public class GradeReportLine {
 	}
 
 	/**
-	 * Constructor de items con 7 parámetros.
+	 * Constructor de GRL con 7 parámetros.
 	 * 
 	 * @param id
+	 *            id de la categoría
 	 * @param name
+	 *            nombre de la categoría
 	 * @param level
+	 *            nivel de profundidad
 	 * @param type
+	 *            categoría o item
 	 * @param weight
+	 *            peso
 	 * @param rangeMin
+	 *            rango mínimo de calificación
 	 * @param rangeMax
+	 *            rango máximo de calificación
 	 */
-	// RMS changed types float to String in ranges
 	public GradeReportLine(int id, String name, int level, boolean type, float weight, String rangeMin, String rangeMax,
 			String grade, float percentage, String nameType) {
 		this.id = id;
@@ -175,9 +185,7 @@ public class GradeReportLine {
 	 * 
 	 * @param rangeMax
 	 */
-	// RMS changed
 	public void setRangeMax(String rangeMax) {
-		// public void setRangeMax(float rangeMax) {
 		this.rangeMax = rangeMax;
 	}
 
@@ -186,9 +194,7 @@ public class GradeReportLine {
 	 * 
 	 * @return rangeMin
 	 */
-	// RMS changed
 	public String getRangeMin() {
-		// public float getRangeMin() {
 		return this.rangeMin;
 	}
 
@@ -197,9 +203,7 @@ public class GradeReportLine {
 	 * 
 	 * @param rangeMin
 	 */
-	// RMS changed
 	public void setRangeMin(String rangeMin) {
-		// public void setRangeMin(float rangeMin) {
 		this.rangeMin = rangeMin;
 	}
 
@@ -267,7 +271,7 @@ public class GradeReportLine {
 	}
 
 	/**
-	 * Crea uan actividad a partir del GradeReportLine
+	 * Crea una actividad a partir del GradeReportLine
 	 */
 	public void setActivity() {
 		this.activity = new Activity(name, typeName, weight, rangeMin, rangeMax);

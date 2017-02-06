@@ -13,6 +13,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.stage.Stage;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import model.*;
 import webservice.*;
 
@@ -20,9 +24,13 @@ import webservice.*;
  * Clase controlador de la ventana de Login
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class LoginController {
+	
+	static final Logger logger = LoggerFactory.getLogger(LoginController.class);
+	
 	@FXML
 	private Label lblStatus;
 	@FXML
@@ -48,22 +56,19 @@ public class LoginController {
 		UBUGrades.init.getScene().setCursor(Cursor.WAIT);
 		UBUGrades.host = txtHost.getText();
 		UBUGrades.session = new Session(txtUsername.getText(), txtPassword.getText());
+
 		Boolean correcto = true;
-
-		// new Thread(task).start();
-		// copyWorker.getOnCancelled();
-
 		progressBar.visibleProperty().set(false);
-		// UBUGrades.stage.show();
 
-		try {
+		try { // Establecemos el token
 			UBUGrades.session.setToken();
 		} catch (Exception e) {
 			correcto = false;
+			logger.error("No se ha podido establecer el token d usuario. {}", e);
 		}
 		// Si el login es correcto
 		if (correcto) {
-			System.out.println(" Login Correcto");
+			logger.info(" Login Correcto");
 
 			progressBar.setProgress(0.0);
 			Task<Object> task = createWorker();
@@ -76,39 +81,32 @@ public class LoginController {
 						// Load GUI
 						try {
 							// Accedemos a la siguiente ventana
-							// FXMLLoader loader = new FXMLLoader();
-							// loader.setLocation(getClass().getResource("../view/Welcome.fxml"));
 							FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Welcome.fxml"));
 
 							UBUGrades.stage = new Stage();
 
 							Parent root = loader.load();
-							// root.setCursor(Cursor.WAIT);
 							Scene scene = new Scene(root);
 							UBUGrades.stage.setScene(scene);
 							UBUGrades.stage.getIcons().add(new Image("/img/logo_min.png"));
 							UBUGrades.stage.setTitle("UBUGrades");
 							UBUGrades.init.close();
 							UBUGrades.stage.show();
-							// UBUGrades.init.close();
 							lblStatus.setText("");
 						} catch (Exception e) {
 							e.printStackTrace();
 							throw new RuntimeException("Loading Welcome.fxml");
 						}
 					} else {
-						System.out.println(newValue);
-						// labelState.setText(newValue);
+						logger.info(newValue);
 					}
 				}
 			});
-
 			Thread th = new Thread(task);
 			th.start();
-
 		} else {
 			lblStatus.setText(" Usuario incorrecto");
-			System.out.println("Login Incorrecto");
+			logger.info("Login Incorrecto");
 			txtUsername.setText("");
 			txtPassword.setText("");
 		}
@@ -129,8 +127,7 @@ public class LoginController {
 				MoodleUserWS.setCourses(UBUGrades.session.getToken(), UBUGrades.user);
 				updateProgress(2, 3);
 				updateProgress(3, 3);
-				UBUGrades.init.getScene().setCursor(Cursor.DEFAULT);
-				Thread.sleep(100);
+				Thread.sleep(50);
 				updateMessage("end");
 				return true;
 			}
@@ -138,7 +135,7 @@ public class LoginController {
 	}
 
 	/**
-	 * Borra los parámetros introducidos de los campos
+	 * Borra los parámetros introducidos en los campos
 	 * 
 	 * @param event
 	 * @throws Exception

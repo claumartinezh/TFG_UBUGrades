@@ -10,6 +10,7 @@ import org.json.JSONObject;
  * Clase que representa un usuario matriculado en una asignatura
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class EnrolledUser {
@@ -17,7 +18,6 @@ public class EnrolledUser {
 	private String firstName;
 	private String lastName;
 	private String fullName;
-	// private String email;
 	private Date firstAccess;
 	private Date lastAccess;
 	public String description;
@@ -44,32 +44,16 @@ public class EnrolledUser {
 
 		if (obj.getString("firstname") != null)
 			this.firstName = obj.getString("firstname");
-
 		if (obj.getString("lastname") != null)
 			this.lastName = obj.getString("lastname");
-
-		/*
-		 * if (obj.getString("firstname") != null) this.firstName =
-		 * obj.getString("firstname"); if (obj.getString("lastname") != null)
-		 * this.lastName = obj.getString("lastname");
-		 */
 		if (obj.getString("fullname") != null)
 			this.fullName = obj.getString("fullname");
-		/*
-		 * if (obj.getString("email") != null) this.email =
-		 * obj.getString("email");
-		 */
 		if (new Date(obj.getLong("firstaccess")) != null)
 			this.firstAccess = new Date(obj.getLong("firstaccess") * 1000);
 		if (new Date(obj.getLong("lastaccess")) != null)
 			this.lastAccess = new Date(obj.getLong("lastaccess") * 1000);
-		/*
-		 * if (obj.getString("description") != null) this.description =
-		 * obj.getString("description");
-		 */
 		if (obj.getString("profileimageurl") != null)
 			this.profileImageUrl = obj.getString("profileimageurl");
-
 		if (obj.getJSONArray("roles") != null) {
 			JSONArray roleArray = obj.getJSONArray("roles");
 			roles = new ArrayList<Role>();
@@ -83,28 +67,22 @@ public class EnrolledUser {
 					roles.add(rol);
 			}
 		}
-		// RMS
 		if (obj.optJSONArray("groups") != null) {
-			// if (obj.getJSONArray("groups") != null) {
 			JSONArray groupArray = obj.getJSONArray("groups");
 			groups = new ArrayList<Group>();
 			for (int i = 0; i < groupArray.length(); i++) {
 				// Establece un grupo con el id, name y description obtenido de
-				// cada
-				// JSONObject del JSONArray
+				// cada JSONObject del JSONArray
 				Group group = new Group(groupArray.getJSONObject(i).getInt("id"),
 						groupArray.getJSONObject(i).getString("name"),
 						groupArray.getJSONObject(i).getString("description"));
 				if (group != null)
 					groups.add(group);
 			}
-		}
-		// Added by RMS
-		else {
+		} else {
 			groups = new ArrayList<>(); // to have an empty list, not a null
 		}
 		this.courses = new ArrayList<Integer>();
-		// this.setCourses(token);
 	}
 
 	/**
@@ -125,24 +103,44 @@ public class EnrolledUser {
 		this.id = id;
 	}
 
+	/**
+	 * Devuelve el nombre del usuario
+	 * 
+	 * @return firstName
+	 */
 	public String getFirstName() {
 		return this.firstName;
 	}
 
+	/**
+	 * Modifica el nombre del usuario
+	 * 
+	 * @param firstName
+	 */
 	public void setFirstName(String firstName) {
 		this.firstName = firstName;
 	}
 
+	/**
+	 * Devuelve el apellido del usuario
+	 * 
+	 * @return lastName
+	 */
 	public String getLastName() {
 		return this.lastName;
 	}
 
+	/**
+	 * Modifica el apellido del usuario
+	 * 
+	 * @param lastName
+	 */
 	public void setlastName(String lastName) {
 		this.lastName = lastName;
 	}
 
 	/**
-	 * Devuelve el nombre del usuario
+	 * Devuelve el nombre completo del usuario
 	 * 
 	 * @return fullName
 	 */
@@ -151,7 +149,7 @@ public class EnrolledUser {
 	}
 
 	/**
-	 * Modifica el nombre del usuario
+	 * Modifica el nombre completo del usuario
 	 * 
 	 * @param fullName
 	 */

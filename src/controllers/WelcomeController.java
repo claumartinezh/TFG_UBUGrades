@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.ResourceBundle;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -25,6 +28,7 @@ import model.*;
  * cursos del usuario logueado.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class WelcomeController implements Initializable {
@@ -36,6 +40,8 @@ public class WelcomeController implements Initializable {
 	@FXML
 	private Label lblNoSelect;
 
+	static final Logger logger = LoggerFactory.getLogger(WelcomeController.class);
+	
 	/**
 	 * Función initialize. Muestra la lista de cursos del usuario introducido.
 	 */
@@ -43,7 +49,7 @@ public class WelcomeController implements Initializable {
 	public void initialize(URL location, ResourceBundle resources) {
 		try {
 			lblUser.setText(UBUGrades.user.getFullName());
-			System.out.println("Cargando cursos...");
+			logger.info("Cargando cursos...");
 			ArrayList<String> nameCourses = new ArrayList<String>();
 			for (int i = 0; i < UBUGrades.user.getCourses().size(); i++) {
 				nameCourses.add(UBUGrades.user.getCourses().get(i).getFullName());
@@ -70,18 +76,15 @@ public class WelcomeController implements Initializable {
 			// Guardamos en una variable el curso seleccionado por el usuario
 			String selectedCourse = listCourses.getSelectionModel().getSelectedItem();
 			UBUGrades.session.setActualCourse(Course.getCourseByString(selectedCourse));
-			System.out.println(" Curso seleccionado: " + UBUGrades.session.getActualCourse().getFullName());
+			logger.info(" Curso seleccionado: " + UBUGrades.session.getActualCourse().getFullName());
 
 			// Accedemos a la siguiente ventana:
-			// FXMLLoader loader = new FXMLLoader();
-			// loader.setLocation(getClass().getResource("../view/Main.fxml"));
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Main.fxml"));
 
 			UBUGrades.stage.close();
 			UBUGrades.stage = new Stage();
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
-			// scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			UBUGrades.stage.setScene(scene);
 			UBUGrades.stage.getIcons().add(new Image("/img/logo_min.png"));
 			UBUGrades.stage.setTitle("UBUGrades");
@@ -89,10 +92,10 @@ public class WelcomeController implements Initializable {
 			UBUGrades.stage.show();
 			UBUGrades.init.getScene().setCursor(Cursor.DEFAULT);
 			lblNoSelect.setText("");
-			// System.out.println("-- Entrando al curso");
+			// logger.info("-- Entrando al curso");
 		} catch (Exception e) {
 			lblNoSelect.setText("Debe seleccionar un curso");
-			System.out.println("Debe seleccionar un curso");
+			logger.info("Debe seleccionar un curso");
 		}
 
 	}

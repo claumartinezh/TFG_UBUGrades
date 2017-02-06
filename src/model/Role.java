@@ -4,6 +4,7 @@ package model;
  * Clase Role para distinguir el rol de los usuarios matriculados en un curso.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Role {
@@ -22,7 +23,6 @@ public class Role {
 	 *            nombre corto
 	 */
 	public Role(int id, String name, String shortName) {
-		// super();
 		this.id = id;
 		this.name = name;
 		this.shortName = shortName;

@@ -20,14 +20,19 @@ import model.MoodleUser;
  * relacionados con un MoodleUser.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class MoodleUserWS {
 	/**
+	 * Establece los parámetros del usuario logueado.
 	 * 
 	 * @param token
+	 *            token de usuario
 	 * @param eMail
+	 *            email de usuario
 	 * @param mUser
+	 *            moodleUser
 	 * @throws Exception
 	 */
 	public static void setMoodleUser(String token, String eMail, MoodleUser mUser) throws Exception {
@@ -39,7 +44,7 @@ public class MoodleUserWS {
 			CloseableHttpResponse response = httpclient.execute(httpget);
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
-				// System.out.println(respuesta);
+				// logger.info(respuesta);
 				JSONArray jsonArray = new JSONArray(respuesta);
 				if (jsonArray != null) {
 					JSONObject jsonObject = (JSONObject) jsonArray.get(0);

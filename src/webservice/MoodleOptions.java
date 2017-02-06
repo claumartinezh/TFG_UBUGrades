@@ -4,6 +4,7 @@ package webservice;
  * Clase que recoge las funciones de servicios web a utilizar.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class MoodleOptions {

@@ -8,6 +8,7 @@ import org.json.JSONObject;
  * Clase Activity. Implementar en el futuro.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Activity implements Serializable {
@@ -15,13 +16,20 @@ public class Activity implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String itemName;
 	private String activityType;
-	// private String level;
 	private float weight;
 	private String minRange;
 	private String maxRange;
-	// private float percentage;
 	private float contributionCourseTotal;
 
+	/**
+	 * Constructor de Activity
+	 * 
+	 * @param token
+	 *            token de MoodleUser
+	 * @param obj
+	 *            objeto JSON con la información de la actividad
+	 * @throws Exception
+	 */
 	public Activity(String token, JSONObject obj) throws Exception {
 		// TODO
 	}

@@ -13,6 +13,10 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import controllers.MainController;
 import controllers.UBUGrades;
 import model.Course;
 import model.EnrolledUser;
@@ -23,16 +27,21 @@ import model.GradeReportLine;
  * relacionados con un curso.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class CourseWS {
+
+	static final Logger logger = LoggerFactory.getLogger(CourseWS.class);
+
 	/**
-	 * Función que establece los usuarios que están matriculados en un curso.
+	 * Establece los usuarios que están matriculados en un curso junto con su
+	 * rol y grupo.
 	 * 
 	 * @param token
 	 *            token de usuario
 	 * @param idCurso
-	 *            id del curso deseado
+	 *            id del curso
 	 * @throws Exception
 	 */
 	public static void setEnrolledUsers(String token, Course course) throws Exception {
@@ -66,9 +75,9 @@ public class CourseWS {
 	}
 
 	/**
-	 * Función que establece los GradeReportConfigurationLine de un usuario en
+	 * Establece los GradeReportLine de un usuario en
 	 * un curso. Esta función se usará para obtener todos los
-	 * GradeReportConfigurationLine del primer usuario matriculado y así sacar
+	 * GradeReportLine del primer usuario matriculado y así sacar
 	 * la estructura del calificador del curso para después mostrarla como
 	 * TreeView en la vista
 	 * 
@@ -77,6 +86,7 @@ public class CourseWS {
 	 * @param courseId
 	 *            curso del que se quieren cargar los datos
 	 * @param userId
+	 *            id del usuario a cargar
 	 * @throws Exception
 	 */
 	public static void setGradeReportLines(String token, int userId, Course course) throws Exception {
@@ -85,14 +95,14 @@ public class CourseWS {
 			String call = UBUGrades.host + "/webservice/rest/server.php?wstoken=" + token
 					+ "&moodlewsrestformat=json&wsfunction=" + MoodleOptions.OBTENER_TABLA_NOTAS + "&courseid="
 					+ course.getId() + "&userid=" + userId;
-			// System.out.println(call);
+			// logger.info(call);
 			HttpGet httpget = new HttpGet(call);
 			CloseableHttpResponse response = httpclient.execute(httpget);
 			try {
 				String respuesta = EntityUtils.toString(response.getEntity());
 				JSONObject jsonArray = new JSONObject(respuesta);
-				// System.out.println("response: "+jsonArray.toString());
-				// lista de GradeReportConfigurationLines
+				// logger.info("response: "+jsonArray.toString());
+				// lista de GradeReportLines
 				course.gradeReportLines = new ArrayList<GradeReportLine>();
 				// En esta pila sólo van a entrar Categorías. Se mantendrán en
 				// la pila mientran tengan descendencia.
@@ -105,12 +115,12 @@ public class CourseWS {
 					JSONObject alumn = (JSONObject) tables.get(0);
 
 					JSONArray tableData = (JSONArray) alumn.getJSONArray("tabledata");
-					/*
-					 * System.out.println("TableData:");
-					 * System.out.println(tableData); System.out.println();
-					 */
+
+					// logger.info("TableData:");
+					// logger.info(tableData); logger.info();
+
 					// El elemento table data tiene las líneas del configurador
-					// (que convertiremos a GradeReportConfigurationLines)
+					// (que convertiremos a GradeReportLines)
 					for (int i = 0; i < tableData.length(); i++) {
 						JSONObject tableDataElement = tableData.getJSONObject(i);
 						// sea categoría o item, se saca de la misma manera el
@@ -154,9 +164,8 @@ public class CourseWS {
 							String grade = "-";
 							// Si no hay nota numérica
 							if (!gradeContainer.getString("content").contains("-")) {
-								// Float.parseFloat(gradeContainer.getString("content"));
 								grade = getNumber(gradeContainer.getString("content"));
-								// System.out.println(" - Nota item: " + grade);
+								// logger.info(" - Nota item: " + grade);
 							}
 
 							// Sacamos el porcentaje
@@ -166,29 +175,22 @@ public class CourseWS {
 								percentage = getFloat(percentageContainer.getString("content"));
 							}
 							// Sacamos el peso
-							// RMS Changed
 							JSONObject weightContainer = tableDataElement.optJSONObject("weight");
 							Float weight = Float.NaN;
 							if (weightContainer != null) {
 								if (!weightContainer.getString("content").contains("-")) {
 									weight = getFloat(weightContainer.getString("content"));
-									// System.out.println(" - Nota item: " +
-									// weight);
-								} /*
-									 * else{
-									 * //System.out.println("   - No hay peso: "
-									 * + weight); }
-									 */
+									// logger.info(" - Nota item: " + weight);
+								}
 							}
 							// Sacamos el rango
 							JSONObject rangeContainer = tableDataElement.getJSONObject("range");
-							// RMS changed
 							String rangeMin = getRange(rangeContainer.getString("content"), true);
 							String rangeMax = getRange(rangeContainer.getString("content"), false);
-							// System.out.println(" - Rango: " + rangeMin + "-"
-							// + rangeMax);
-							// System.out.println(" - Rango: " + rangeMin + "-"
-							// + rangeMax);
+							// logger.info("-Rango: " + rangeMin + "-" +
+							// rangeMax);
+							// logger.info(" - Rango: " + rangeMin + "-" +
+							// rangeMax);
 							if (typeLine) { // Si es un item
 								// Añadimos la linea actual
 								GradeReportLine actualLine = new GradeReportLine(idLine, nameLine, actualLevel,
@@ -211,8 +213,7 @@ public class CourseWS {
 								// dejarla como una categoria completa
 								course.updateGRLList(actualLine);
 							}
-							// --- Si es una categoría
-						} else {
+						} else {// --- Si es una categoría
 							String nameLine = getNameCategorie(itemname.getString("content"));
 
 							// Añadimos la cabecera de la categoria a la pila
@@ -234,6 +235,9 @@ public class CourseWS {
 			} finally {
 				response.close();
 			}
+		} catch (Exception e) {
+			logger.error("Error de conexión");
+			MainController.errorDeConexion();
 		} finally {
 			httpclient.close();
 		}
@@ -251,7 +255,7 @@ public class CourseWS {
 	}
 
 	/**
-	 * Devuelve el nivel del GradeReportConfigurationLine que está siendo leída.
+	 * Devuelve el nivel del GradeReportLine que está siendo leída.
 	 * 
 	 * @param data
 	 * @return nivel de la línea
@@ -270,12 +274,12 @@ public class CourseWS {
 	 */
 	public static String getNameCategorie(String data) {
 		String result = "";
-		// busco el final de la cadena única a partir de la cual empieza el
+		// Busco el final de la cadena única a partir de la cual empieza el
 		// nombre de la categoría
 		int begin = data.lastIndexOf("/>") + 2;
-		// el nombre termina al final de todo el texto
+		// El nombre termina al final de todo el texto
 		int end = data.length();
-		// me quedo con la cadena entre esos índices
+		// Me quedo con la cadena entre esos índices
 		result = data.substring(begin, end);
 
 		return result;
@@ -336,7 +340,6 @@ public class CourseWS {
 	 * @param option
 	 * @return rango máximo o mínimo
 	 */
-	// RMS change float by String (ranges can be texts...!!!)
 	public static String getRange(String data, boolean option) {
 		String[] ranges = data.split("&ndash;");
 		if (option) // true = rango mínimo
@@ -425,6 +428,5 @@ public class CourseWS {
 			return data.substring(match.start(), match.end());
 		}
 		return data;
-
 	}
 }

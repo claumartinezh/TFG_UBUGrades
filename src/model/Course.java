@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import controllers.UBUGrades;
 
@@ -17,6 +19,7 @@ import controllers.UBUGrades;
  * participantes, y tipos de actividades.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Course implements Serializable {
@@ -33,10 +36,20 @@ public class Course implements Serializable {
 	public ArrayList<GradeReportLine> gradeReportLines;
 	public Set<String> typeActivities;
 
+	static final Logger logger = LoggerFactory.getLogger(Course.class);
+
 	public Course() {
 		this.enrolledUsers = new ArrayList<EnrolledUser>();
 	}
 
+	/**
+	 * Constructor de un curso a partir de contenido JSON. Establece los
+	 * parámetros de un curso.
+	 * 
+	 * @param obj
+	 *            objeto JSON con la información del curso
+	 * @throws Exception
+	 */
 	public Course(JSONObject obj) throws Exception {
 		this.id = obj.getInt("id");
 		if (obj.getString("shortname") != null)
@@ -243,13 +256,13 @@ public class Course implements Serializable {
 	 *            usuarios del curso
 	 */
 	public void setGroups(ArrayList<EnrolledUser> users) {
-		// creamos el set de grupos
+		// Creamos el set de grupos
 		groups = new HashSet<String>();
-		// recorremos la lista de usuarios matriculados en el curso
+		// Recorremos la lista de usuarios matriculados en el curso
 		for (int i = 0; i < users.size(); i++) {
-			// sacamos el grupo del usuario
+			// Sacamos el grupo del usuario
 			ArrayList<Group> groupsArray = users.get(i).getGroups();
-			// cada grupo nuevo se añade al set de grupos
+			// Cada grupo nuevo se añade al set de grupos
 			for (int j = 0; j < groupsArray.size(); j++) {
 				groups.add(groupsArray.get(j).getName());
 			}
@@ -333,7 +346,7 @@ public class Course implements Serializable {
 		Course course = null;
 
 		ArrayList<Course> courses = (ArrayList<Course>) UBUGrades.user.getCourses();
-		// System.out.println(" Nº de cursos: " + courses.size());
+		// logger.info(" Nº de cursos: " + courses.size());
 		for (int i = 0; i < courses.size(); i++) {
 			if (courses.get(i).getFullName().equals(courseName)) {
 				course = courses.get(i);

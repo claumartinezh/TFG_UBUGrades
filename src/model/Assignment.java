@@ -8,6 +8,7 @@ import org.json.JSONObject;
  * Clase Assignment (Tarea). Implementar versiones futuras.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Assignment extends Activity {

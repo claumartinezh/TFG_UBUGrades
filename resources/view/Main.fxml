@@ -7,7 +7,6 @@
 <?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
-<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
@@ -74,7 +73,7 @@
                                  </tickLabelFont></CategoryAxis>
                   </xAxis>
                   <yAxis>
-                    <NumberAxis fx:id="yAxis" autoRanging="true" side="LEFT">
+                    <NumberAxis fx:id="yAxis" animated="false" autoRanging="false" side="LEFT" tickLength="5.0" tickUnit="1.0" upperBound="10.0">
                                  <tickLabelFont>
                                     <Font size="12.0" />
                                  </tickLabelFont></NumberAxis>

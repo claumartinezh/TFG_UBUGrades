@@ -14,10 +14,11 @@ import controllers.UBUGrades;
 import model.EnrolledUser;
 
 /**
- * Clase EnrolledUser para webservices.Recoge funciones útiles para servicios web
- * relacionados con un EnrolledUser.
+ * Clase EnrolledUser para webservices.Recoge funciones útiles para servicios
+ * web relacionados con un EnrolledUser.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class EnrolledUserWS {

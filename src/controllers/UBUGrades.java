@@ -1,5 +1,8 @@
 package controllers;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +16,7 @@ import webservice.Session;
  * Clase main. Inicializa la ventana de login
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class UBUGrades extends Application {
@@ -21,23 +25,23 @@ public class UBUGrades extends Application {
 	public static Stage init;
 	public static Session session;
 	public static MoodleUser user;
-
+	
+	static final Logger logger = LoggerFactory.getLogger(UBUGrades.class);
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			System.out.println("[Bienvenido a UBUGrades]");
-			// FXMLLoader loader = new FXMLLoader();
-			// loader.setLocation(getClass().getResource("../view/Login.fxml"));
+			logger.info("[Bienvenido a UBUGrades]");
 			FXMLLoader loader = new FXMLLoader(getClass().getResource("/view/Login.fxml"));
 			Parent root = loader.load();
 			Scene scene = new Scene(root);
-			// scene.getStylesheets().add(UBUGrades.class.getResource("/config/style.css").toExternalForm());
 			init = primaryStage;
 			init.setScene(scene);
 			init.getIcons().add(new Image("/img/logo_min.png"));
 			UBUGrades.init.setTitle("UBUGrades");
 			init.show();
 		} catch (Exception e) {
+			logger.error("Error al iniciar UBUGrades");
 			e.printStackTrace();
 		}
 	}

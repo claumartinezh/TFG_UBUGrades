@@ -5,6 +5,7 @@ package model;
  * grupos en los que se encuentra un usuario.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Group {

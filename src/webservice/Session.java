@@ -15,6 +15,7 @@ import model.Course;
  * la sesión.
  * 
  * @author Claudia Martínez Herrero
+ * @version 1.0
  *
  */
 public class Session {
